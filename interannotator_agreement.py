@@ -63,7 +63,7 @@ def partial_accuracy(coder_1, coder_2):
             # The result is also correct if coder 1 gives more recs than coder 2
             if item in coder_2[i]:
                 # If coder 2 does not give enough recs, the accuracy will not be 1
-                subtotal_accuracy += 1/len(coder_1[i])
+                subtotal_accuracy += 1/max(len(coder_1[i]), len(coder_2[i]))
         print(subtotal_accuracy)
         total_accuracy += subtotal_accuracy
     return total_accuracy / len(coder_1)
