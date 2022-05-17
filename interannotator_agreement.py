@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
 from nltk.metrics.agreement import AnnotationTask
 from nltk.metrics import masi_distance
+from statistics import mean
 
 training_set_100 = pd.read_csv("training_set_100.csv")
 training_set_Harm = pd.read_csv("training_set_Harm.csv")
@@ -17,6 +18,7 @@ labels_Miriam = training_set_Miriam['Labels'].tolist()[0:50]
 labels_alex = [set([int(y) for y in x.split(",")]) for x in labels_alex]
 labels_Harm = [set([int(y) for y in x.split(",")]) for x in labels_Harm]
 labels_Miriam = [set([int(y) for y in x.split(",")]) for x in labels_Miriam]
+#print(labels_alex, "\n", labels_Harm, "\n", labels_Miriam)
 # Data should have the following format:
 # List of 3-tuples
 # Each tuple represents coder, item (patient), label (as frozen set)
@@ -51,8 +53,13 @@ labels = list(range(1, 12))
 mlb.fit([labels]) #why is MLB so retarded? A list of a list? Why?
 labels_alex_transformed = mlb.transform(labels_alex)
 labels_Harm_transformed = mlb.transform(labels_Harm)
-print("The Hamming Loss is", metrics.hamming_loss(labels_alex_transformed, labels_Harm_transformed))
-print("The strictly matching accuracy is ", metrics.accuracy_score(labels_alex_transformed, labels_Harm_transformed))
+labels_Miriam_transformed = mlb.transform(labels_Miriam)
+#print([metrics.hamming_loss(labels_alex_transformed, labels_Harm_transformed),
+                                       #metrics.hamming_loss(labels_alex_transformed, labels_Miriam_transformed)])
+print("The mean Hamming Loss is", mean([metrics.hamming_loss(labels_alex_transformed, labels_Harm_transformed),
+                                       metrics.hamming_loss(labels_alex_transformed, labels_Miriam_transformed)]))
+print("The mean strictly matching accuracy is ", mean([metrics.accuracy_score(labels_alex_transformed, labels_Harm_transformed),
+                                                      metrics.accuracy_score(labels_alex_transformed, labels_Miriam_transformed)]))
 
 
 def partial_accuracy(coder_1, coder_2):
@@ -78,5 +85,6 @@ def partial_accuracy(coder_1, coder_2):
         total_accuracy += subtotal_accuracy
     return total_accuracy / len(coder_1)
 
-print("The partial accuracy is ", partial_accuracy(labels_alex, labels_Harm))
-print("Is the partial accuracy function commutative? See for yourself: ", partial_accuracy(labels_Harm, labels_alex))
+print("The mean partial accuracy is ", mean([partial_accuracy(labels_alex, labels_Harm),
+                                            partial_accuracy(labels_alex, labels_Miriam)]))
+#print("Is the partial accuracy function commutative? See for yourself: ", partial_accuracy(labels_Harm, labels_alex))
