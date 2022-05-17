@@ -57,9 +57,11 @@ labels_Miriam_transformed = mlb.transform(labels_Miriam)
 #print([metrics.hamming_loss(labels_alex_transformed, labels_Harm_transformed),
                                        #metrics.hamming_loss(labels_alex_transformed, labels_Miriam_transformed)])
 print("The mean Hamming Loss is", mean([metrics.hamming_loss(labels_alex_transformed, labels_Harm_transformed),
-                                       metrics.hamming_loss(labels_alex_transformed, labels_Miriam_transformed)]))
+                                       metrics.hamming_loss(labels_alex_transformed, labels_Miriam_transformed),
+                                        metrics.hamming_loss(labels_Harm_transformed, labels_Miriam_transformed)]))
 print("The mean strictly matching accuracy is ", mean([metrics.accuracy_score(labels_alex_transformed, labels_Harm_transformed),
-                                                      metrics.accuracy_score(labels_alex_transformed, labels_Miriam_transformed)]))
+                                                      metrics.accuracy_score(labels_alex_transformed, labels_Miriam_transformed),
+                                                       metrics.accuracy_score(labels_Harm_transformed, labels_Miriam_transformed)]))
 
 
 def partial_accuracy(coder_1, coder_2):
@@ -86,5 +88,6 @@ def partial_accuracy(coder_1, coder_2):
     return total_accuracy / len(coder_1)
 
 print("The mean partial accuracy is ", mean([partial_accuracy(labels_alex, labels_Harm),
-                                            partial_accuracy(labels_alex, labels_Miriam)]))
+                                            partial_accuracy(labels_alex, labels_Miriam),
+                                             partial_accuracy(labels_Miriam, labels_Harm)]))
 #print("Is the partial accuracy function commutative? See for yourself: ", partial_accuracy(labels_Harm, labels_alex))
