@@ -8,12 +8,15 @@ from nltk.metrics import masi_distance
 
 training_set_100 = pd.read_csv("training_set_100.csv")
 training_set_Harm = pd.read_csv("training_set_Harm.csv")
+training_set_Miriam = pd.read_csv("training_set_Miriam.csv")
 
 labels_alex = training_set_100['Labels'].tolist()[0:50]
 labels_Harm = training_set_Harm['Labels'].tolist()[0:50]
+labels_Miriam = training_set_Miriam['Labels'].tolist()[0:50]
 # We have to compare sets of labels, not strings
 labels_alex = [set([int(y) for y in x.split(",")]) for x in labels_alex]
 labels_Harm = [set([int(y) for y in x.split(",")]) for x in labels_Harm]
+labels_Miriam = [set([int(y) for y in x.split(",")]) for x in labels_Miriam]
 # Data should have the following format:
 # List of 3-tuples
 # Each tuple represents coder, item (patient), label (as frozen set)
@@ -21,8 +24,10 @@ task_data = []
 for i in range(len(labels_alex)):
     alex_tuple = tuple(['Alex', 'Patient' + str(i), frozenset(labels_alex[i])])
     harm_tuple = tuple(['Harm', 'Patient' + str(i), frozenset(labels_Harm[i])])
+    miriam_tuple = tuple(['Miriam', 'Patient' + str(i), frozenset(labels_Miriam[i])])
     task_data.append(alex_tuple)
     task_data.append(harm_tuple)
+    task_data.append(miriam_tuple)
 
 task = AnnotationTask(distance = masi_distance)
 task.load_array(task_data)
