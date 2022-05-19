@@ -1,5 +1,4 @@
 import pandas as pd
-from disagree import metrics as disagree_metrics
 from sklearn import metrics
 import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
