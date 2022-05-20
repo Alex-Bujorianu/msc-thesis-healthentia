@@ -5,6 +5,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from nltk.metrics.agreement import AnnotationTask
 from nltk.metrics import masi_distance
 from statistics import mean
+from helper import partial_accuracy
 
 training_set_100 = pd.read_csv("training_set_100.csv")
 training_set_Harm = pd.read_csv("training_set_Harm.csv")
@@ -63,28 +64,6 @@ print("The mean strictly matching accuracy is ", mean([metrics.accuracy_score(la
                                                        metrics.accuracy_score(labels_Harm_transformed, labels_Miriam_transformed)]))
 
 
-def partial_accuracy(coder_1, coder_2):
-    "This function is commutative: the order doesn’t matter."
-    if len(coder_1) != len(coder_2):
-        raise Exception("Lengths have to be the same")
-    total_accuracy = 0
-    for i in range(len(coder_1)):
-        subtotal_accuracy = 0
-        # Recs can be lists, tuples or sets in the data, but are always converted to sets
-        # If we use lists, even if we sort them, the accuracy will be too low because of length inequalities
-        coder_1[i] = set(coder_1[i])
-        coder_2[i] = set(coder_2[i])
-        #print(coder_1[i], coder_2[i])
-        for item in coder_1[i]:
-            # What if coder 2 gives more recs than coder 1?
-            # The code below will still give the correct answer
-            # If coder 2 gives 5 recs, coder 1 gives 1 rec, accuracy will be 0.2 if at least one rec matches between the two
-            # The result is also correct if coder 1 gives more recs than coder 2
-            if item in coder_2[i]:
-                subtotal_accuracy += 1/max(len(coder_1[i]), len(coder_2[i]))
-        #print(subtotal_accuracy)
-        total_accuracy += subtotal_accuracy
-    return total_accuracy / len(coder_1)
 
 print("The mean partial accuracy is ", mean([partial_accuracy(labels_alex, labels_Harm),
                                             partial_accuracy(labels_alex, labels_Miriam),

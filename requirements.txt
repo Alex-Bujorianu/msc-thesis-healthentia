@@ -1,4 +1,5 @@
 pandas
+matplotlib
 sklearn
 scikit-multilearn
 numpy
