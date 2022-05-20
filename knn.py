@@ -1,4 +1,4 @@
-from skmultilearn.adapt import MLkNN
+from skmultilearn.adapt import MLkNN, BRkNNaClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold, cross_val_score
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
@@ -59,3 +59,20 @@ print("The partial accuracy of MLkNN is ",
 print("The proportion of length mismatches is ",
       count_mismatch_proportion(mlb.inverse_transform(predictions), mlb.inverse_transform(y_test)))
 print(mlb.inverse_transform(predictions), "\n", mlb.inverse_transform(y_test))
+
+# Comparison with binary relevance knn
+# Mlknn incorporates MAP
+# See docs here: http://scikit.ml/api/skmultilearn.adapt.brknn.html
+brknn = BRkNNaClassifier(k=13)
+scores = cross_val_score(brknn, X, Y_transformed,
+                         scoring=make_scorer(hamming_loss, greater_is_better=True),
+                         cv=kfold, n_jobs=-1)
+print("The mean Hamming Loss of Binary Relevance kNN is ", mean(scores),
+      "\n", "The stdev is ", stdev(scores))
+brknn.fit(x_train, y_train)
+predictions_br = brknn.predict(x_test)
+print("The strict accuracy (Binary Relevance) is ",
+      accuracy_score(y_pred=predictions_br, y_true=y_test))
+print("The partial accuracy of BR KNN is ",
+      partial_accuracy(mlb.inverse_transform(predictions_br),
+                       mlb.inverse_transform(y_test)))

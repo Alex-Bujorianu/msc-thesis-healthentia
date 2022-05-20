@@ -13,7 +13,7 @@ print(data)
 names = list(data.keys())
 values = list(data.values())
 
-plt.bar(names, values, color='blue')
+plt.bar(names, values, color='green')
 plt.xlabel("Label number")
 plt.ylabel("Label count")
 plt.title("Unbalanced data")
