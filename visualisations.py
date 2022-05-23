@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from helper import count_labels
 import pandas as pd
 
-column = pd.read_csv("training_set.csv")['Labels']
+column = pd.read_csv("Data/training_set.csv")['Labels']
 labels = [set([int(y) for y in x.split(",")]) for x in column]
 
 data = {}

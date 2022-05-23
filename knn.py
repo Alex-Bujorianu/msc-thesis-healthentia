@@ -2,28 +2,17 @@ from skmultilearn.adapt import MLkNN, BRkNNaClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold, cross_val_score
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
-from helper import partial_accuracy, count_mismatch_proportion, label_accuracy
-import pandas as pd
+from helper import partial_accuracy, count_mismatch_proportion, label_accuracy, get_data
 import numpy as np
 from statistics import mean, stdev
 import matplotlib.pyplot as plt
 
-#Extract and transform data into the right format
-training_set = pd.read_csv("training_set.csv")
-# Drop nuisance variables
-training_set.drop(labels=['participant_id', 'gender', 'Coder', 'Explanation'], axis=1, inplace=True)
-# Don't forget to transform these variables to 0/1
-training_set['diabetes'] = [1 if x=='yes' else 0 for x in training_set['diabetes']]
-training_set['chd'] = [1 if x=='yes' else 0 for x in training_set['chd']]
-X = training_set.drop(labels=['Labels'], axis=1).to_numpy()
-#print("X is: ", X)
+X, Y = get_data("training_set.csv")
 mlb = MultiLabelBinarizer()
 labels = list(range(1, 12))
-mlb.fit([labels]) #why is MLB so retarded? A list of a list? Why?
-Y = [[int(y) for y in x.split(",")] for x in training_set['Labels']]
-Y_transformed = mlb.transform(Y)
+mlb.fit([labels])
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
-y_train, y_test = train_test_split(Y_transformed, train_size=0.8, random_state=101)
+y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
 print(x_test.shape, y_test.shape)
 
 def optimise_mlknn():
@@ -33,7 +22,7 @@ def optimise_mlknn():
     classifier = GridSearchCV(MLkNN(), parameters, cv=5, n_jobs=-1, scoring=make_scorer(hamming_loss, greater_is_better=False))
     print("x train: ", x_train, "\n", "y train: ", y_train)
     # No need to split, classifier already does cross-validation
-    classifier.fit(X, Y_transformed)
+    classifier.fit(X, Y)
     # The negative score is by design, not an error. See: https://stackoverflow.com/questions/44081222/hamming-loss-not-support-in-cross-val-score
     print('best parameters :', classifier.best_params_, 'Best Hamming Loss: ',
           -1 * classifier.best_score_)
@@ -41,7 +30,7 @@ def optimise_mlknn():
 # Optimal params are k=13, s=0.7
 model = MLkNN(k=13, s=0.7)
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
-scores = cross_val_score(model, X, Y_transformed,
+scores = cross_val_score(model, X, Y,
                          scoring=make_scorer(hamming_loss, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
 
@@ -78,7 +67,7 @@ plt.show()
 # Mlknn incorporates MAP
 # See docs here: http://scikit.ml/api/skmultilearn.adapt.brknn.html
 brknn = BRkNNaClassifier(k=13)
-scores = cross_val_score(brknn, X, Y_transformed,
+scores = cross_val_score(brknn, X, Y,
                          scoring=make_scorer(hamming_loss, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
 print("The mean Hamming Loss of Binary Relevance kNN is ", mean(scores),

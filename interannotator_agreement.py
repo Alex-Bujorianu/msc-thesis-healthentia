@@ -7,9 +7,9 @@ from nltk.metrics import masi_distance
 from statistics import mean
 from helper import partial_accuracy
 
-training_set_100 = pd.read_csv("training_set_100.csv")
-training_set_Harm = pd.read_csv("training_set_Harm.csv")
-training_set_Miriam = pd.read_csv("training_set_Miriam.csv")
+training_set_100 = pd.read_csv("Data/training_set_100.csv")
+training_set_Harm = pd.read_csv("Data/training_set_Harm.csv")
+training_set_Miriam = pd.read_csv("Data/training_set_Miriam.csv")
 
 labels_alex = training_set_100['Labels'].tolist()[0:50]
 labels_Harm = training_set_Harm['Labels'].tolist()[0:50]
