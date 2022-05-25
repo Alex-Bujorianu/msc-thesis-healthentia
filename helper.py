@@ -86,3 +86,10 @@ def label_accuracy(y_true: list, y_predicted: list, label: int) -> float:
         return count_predicted / count_true
     else:
         return 0
+
+def inverse_transform(to_transform: list) -> list:
+    "Inverse transform from MLB"
+    mlb = MultiLabelBinarizer()
+    labels = list(range(1, 12))
+    mlb.fit([labels])
+    return mlb.inverse_transform(to_transform)

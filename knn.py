@@ -1,16 +1,12 @@
 from skmultilearn.adapt import MLkNN, BRkNNaClassifier
-from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold, cross_val_score
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
-from helper import partial_accuracy, count_mismatch_proportion, label_accuracy, get_data
+from helper import partial_accuracy, count_mismatch_proportion, label_accuracy, get_data, inverse_transform
 import numpy as np
 from statistics import mean, stdev
 import matplotlib.pyplot as plt
 
 X, Y = get_data("training_set.csv")
-mlb = MultiLabelBinarizer()
-labels = list(range(1, 12))
-mlb.fit([labels])
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
 y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
 print(x_test.shape, y_test.shape)
@@ -44,17 +40,17 @@ model.fit(x_train, y_train)
 predictions = model.predict(x_test)
 print("The strict accuracy is ", accuracy_score(y_pred=predictions, y_true=y_test))
 print("The partial accuracy of MLkNN is ",
-      partial_accuracy(mlb.inverse_transform(predictions),
-                       mlb.inverse_transform(y_test)))
+      partial_accuracy(inverse_transform(predictions),
+                       inverse_transform(y_test)))
 print("The proportion of length mismatches is ",
-      count_mismatch_proportion(mlb.inverse_transform(predictions), mlb.inverse_transform(y_test)))
-print(mlb.inverse_transform(predictions), "\n", mlb.inverse_transform(y_test))
+      count_mismatch_proportion(inverse_transform(predictions), inverse_transform(y_test)))
+print(inverse_transform(predictions), "\n", inverse_transform(y_test))
 
 # Per label performance
 results = {}
 for i in range(1, 12):
-    results[str(i)] = label_accuracy(y_true=mlb.inverse_transform(y_test),
-                                     y_predicted=mlb.inverse_transform(predictions), label=i)
+    results[str(i)] = label_accuracy(y_true=inverse_transform(y_test),
+                                     y_predicted=inverse_transform(predictions), label=i)
 
 names = list(results.keys())
 values = list(results.values())
@@ -77,5 +73,5 @@ predictions_br = brknn.predict(x_test)
 print("The strict accuracy (Binary Relevance) is ",
       accuracy_score(y_pred=predictions_br, y_true=y_test))
 print("The partial accuracy of BR KNN is ",
-      partial_accuracy(mlb.inverse_transform(predictions_br),
-                       mlb.inverse_transform(y_test)))
+      partial_accuracy(inverse_transform(predictions_br),
+                       inverse_transform(y_test)))

@@ -1,12 +1,12 @@
-from sklearn import tree
-from helper import get_data, partial_accuracy
-from skmultilearn.problem_transform import BinaryRelevance
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.model_selection import train_test_split, KFold, cross_val_score
-from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
+from statistics import mean, stdev
 import matplotlib.pyplot as plt
 from numpy import arange
-from statistics import mean, stdev
+from sklearn import tree
+from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
+from sklearn.model_selection import train_test_split, KFold, cross_val_score
+from skmultilearn.problem_transform import BinaryRelevance
+
+from helper import get_data, partial_accuracy, label_accuracy, inverse_transform
 
 X, Y = get_data("training_set.csv")
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
@@ -53,9 +53,20 @@ tree_classifier.fit(x_train, y_train)
 predictions_tree = tree_classifier.predict(x_test)
 print("The strict accuracy of the decision tree is is ",
       accuracy_score(y_pred=predictions_tree, y_true=y_test))
-mlb = MultiLabelBinarizer()
-labels = list(range(1, 12))
-mlb.fit([labels])
 print("The partial accuracy of the decision tree is ",
-      partial_accuracy(mlb.inverse_transform(predictions_tree),
-                       mlb.inverse_transform(y_test)))
+      partial_accuracy(inverse_transform(predictions_tree),
+                       inverse_transform(y_test)))
+
+# Per label performance
+results = {}
+for i in range(1, 12):
+    results[str(i)] = label_accuracy(y_true=inverse_transform(y_test),
+                                     y_predicted=inverse_transform(predictions_tree), label=i)
+
+names = list(results.keys())
+values = list(results.values())
+plt.bar(names, values, color='red')
+plt.xlabel("Label number")
+plt.ylabel("Correctly predicted proportion")
+plt.title("Decision Tree per-label performance")
+plt.show()
