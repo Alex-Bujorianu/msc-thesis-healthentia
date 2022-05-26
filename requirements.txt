@@ -4,3 +4,5 @@ sklearn
 scikit-multilearn
 numpy
 nltk
+sklearn-genetic-opt
+seaborn
