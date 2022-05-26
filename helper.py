@@ -4,7 +4,23 @@ import pandas as pd
 
 mlb = MultiLabelBinarizer()
 labels = list(range(1, 12))
-mlb.fit([labels])  # why is MLB so retarded? A list of a list? Why?
+mlb.fit([labels])
+
+def generate_neurons(max_depth: int, average_neurons_per_layer: int) -> list:
+    """
+    This function is used to generate a Categorical list for use with the genetic algorithm.
+    :param max_depth: The maximum number of hidden layers. The function will progressively create deeper networks.
+    :param average_neurons_per_layer: self-explanatory. A normal distribution is used.
+    :return: A list of tuples, of variable length, where each number in the tuple refers to the number of neurons at the ith hidden layer
+    """
+    to_return = []
+    for i in range(1, max_depth+1):
+        my_tuple = tuple()
+        for j in range(1, i+1):
+            my_tuple = my_tuple + ((max(1, int(np.random.normal(average_neurons_per_layer, int(0.3*average_neurons_per_layer))))),)
+        print(my_tuple)
+        to_return.append(my_tuple)
+    return to_return
 
 def partial_accuracy(coder_1, coder_2):
     "This function is commutative: the order doesn’t matter."
@@ -35,8 +51,8 @@ def partial_accuracy_callable(coder_1, coder_2):
      @param coder_2: same type as above """
     if len(coder_1) != len(coder_2):
         raise Exception("Lengths have to be the same")
-    coder_1 = mlb.inverse_transform(coder_1)
-    coder_2 = mlb.inverse_transform(coder_2)
+    coder_1 = inverse_transform(coder_1)
+    coder_2 = inverse_transform(coder_2)
     total_accuracy = 0
     for i in range(len(coder_1)):
         subtotal_accuracy = 0
@@ -117,7 +133,4 @@ def label_accuracy(y_true: list, y_predicted: list, label: int) -> float:
 
 def inverse_transform(to_transform: list) -> list:
     "Inverse transform from MLB"
-    mlb = MultiLabelBinarizer()
-    labels = list(range(1, 12))
-    mlb.fit([labels])
     return mlb.inverse_transform(to_transform)
