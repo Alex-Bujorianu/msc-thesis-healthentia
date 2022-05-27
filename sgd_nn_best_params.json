@@ -1,1 +1,1 @@
-{"learning_rate_init": 0.21584917921503383, "hidden_layer_sizes": [101], "power_t": 0.41080897923358384, "momentum": 0.9236550376958815, "alpha": 0.0001405107055726119}
+{"learning_rate_init": 0.2870305356327998, "hidden_layer_sizes": [90, 85], "power_t": 0.45187330458606173, "momentum": 0.9069059108700533}

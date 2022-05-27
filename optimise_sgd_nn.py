@@ -35,13 +35,13 @@ parameter_grid = {
 # You can't use different solvers with the genetic algorithm
 
 # Remember to pass the random state parameter otherwise the performance is all over the place
-evolved_nn = MLPClassifier(activation='relu', solver='sgd', learning_rate='invscaling', random_state=101)
+evolved_nn = MLPClassifier(activation='relu', solver='sgd', learning_rate='invscaling', random_state=101, alpha=0.006)
 
 scorer = make_scorer(partial_accuracy_callable, greater_is_better=True)
 
 evolved_estimator = GASearchCV(estimator=evolved_nn,
                                population_size=10,
-                               generations=10,
+                               generations=12,
                               cv=cv,
                               scoring=scorer,
                               param_grid=parameter_grid,
