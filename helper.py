@@ -18,7 +18,6 @@ def generate_neurons(max_depth: int, average_neurons_per_layer: int) -> list:
         my_tuple = tuple()
         for j in range(1, i+1):
             my_tuple = my_tuple + ((max(1, int(np.random.normal(average_neurons_per_layer, int(0.3*average_neurons_per_layer))))),)
-        print(my_tuple)
         to_return.append(my_tuple)
     return to_return
 

@@ -1,4 +1,5 @@
 from sklearn.neural_network import MLPClassifier
+from my_nn import my_nn
 from helper import get_data, partial_accuracy, inverse_transform, partial_accuracy_callable, generate_neurons, scale_data
 from sklearn_genetic.plots import plot_fitness_evolution
 import matplotlib.pyplot as plt
@@ -22,12 +23,10 @@ cv = KFold(n_splits=5, random_state=101, shuffle=True)
 
 # Let's not generate the NN architecture so randomly
 # We want to know if deeper networks perform better or not.
-hidden_layer_sizes = generate_neurons(max_depth=10, average_neurons_per_layer=100)
-print(hidden_layer_sizes)
-
+architecture = generate_neurons(max_depth=10, average_neurons_per_layer=100)
 parameter_grid = {
     'learning_rate_init': Continuous(0.1, 0.3, distribution='uniform'),
-    'hidden_layer_sizes': Categorical(hidden_layer_sizes),
+    'hidden_layer_sizes': Categorical(architecture),
     'power_t': Continuous(0.4, 0.8, distribution='uniform'),
     'momentum': Continuous(0.8, 0.95, distribution='uniform'),
     'alpha': Continuous(0.0001, 0.0002, distribution='uniform')
