@@ -29,7 +29,7 @@ optimise_mlknn()
 model = MLkNN(k=19, s=0.5)
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
 scores = cross_val_score(model, X, Y,
-                         scoring=make_scorer(hamming_loss, greater_is_better=True),
+                         scoring=make_scorer(hamming_loss, greater_is_better=False),
                          cv=kfold, n_jobs=-1)
 
 # We use k-fold validation to have some idea of the variance
@@ -66,7 +66,7 @@ plt.show()
 # See docs here: http://scikit.ml/api/skmultilearn.adapt.brknn.html
 brknn = BRkNNaClassifier(k=19)
 scores = cross_val_score(brknn, X, Y,
-                         scoring=make_scorer(hamming_loss, greater_is_better=True),
+                         scoring=make_scorer(hamming_loss, greater_is_better=False),
                          cv=kfold, n_jobs=-1)
 print("The mean Hamming Loss of Binary Relevance kNN is ", mean(scores),
       "\n", "The stdev is ", stdev(scores))

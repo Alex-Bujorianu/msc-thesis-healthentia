@@ -45,7 +45,7 @@ tree_classifier = BinaryRelevance(
         require_dense = [True, True])
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
 scores = cross_val_score(tree_classifier, X, Y,
-                         scoring=make_scorer(hamming_loss, greater_is_better=True),
+                         scoring=make_scorer(hamming_loss, greater_is_better=False),
                          cv=kfold, n_jobs=-1)
 print("The mean Hamming Loss of the BR decision tree is ", mean(scores),
       "\n", "The stdev is ", stdev(scores))

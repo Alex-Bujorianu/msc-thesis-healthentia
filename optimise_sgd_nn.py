@@ -28,14 +28,14 @@ parameter_grid = {
     'learning_rate_init': Continuous(0.1, 0.3, distribution='uniform'),
     'hidden_layer_sizes': Categorical(architecture),
     'power_t': Continuous(0.4, 0.8, distribution='uniform'),
-    'momentum': Continuous(0.8, 0.95, distribution='uniform'),
-    'alpha': Continuous(0.0001, 0.0002, distribution='uniform')
+    'momentum': Continuous(0.8, 0.95, distribution='uniform')
 }
 
 # If you want to use lbfgs, I suggest putting in a separate file.
-# I don’t think you can use two different solvers with the genetic algorithm
+# You can't use different solvers with the genetic algorithm
 
-evolved_nn = MLPClassifier(activation='relu', solver='sgd', learning_rate='invscaling')
+# Remember to pass the random state parameter otherwise the performance is all over the place
+evolved_nn = MLPClassifier(activation='relu', solver='sgd', learning_rate='invscaling', random_state=101)
 
 scorer = make_scorer(partial_accuracy_callable, greater_is_better=True)
 
