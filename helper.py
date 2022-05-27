@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.preprocessing import MultiLabelBinarizer, StandardScaler
 import pandas as pd
 
 mlb = MultiLabelBinarizer()
@@ -21,6 +21,11 @@ def generate_neurons(max_depth: int, average_neurons_per_layer: int) -> list:
         print(my_tuple)
         to_return.append(my_tuple)
     return to_return
+
+def scale_data(X: np.ndarray) -> np.ndarray:
+    scaler = StandardScaler(with_mean=True, copy=True)
+    scaler.fit(X)
+    return scaler.transform(X)
 
 def partial_accuracy(coder_1, coder_2):
     "This function is commutative: the order doesn’t matter."

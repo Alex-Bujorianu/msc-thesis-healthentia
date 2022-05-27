@@ -1,12 +1,13 @@
 from skmultilearn.adapt import MLkNN, BRkNNaClassifier
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold, cross_val_score
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
-from helper import partial_accuracy, count_mismatch_proportion, label_accuracy, get_data, inverse_transform
+from helper import partial_accuracy, count_mismatch_proportion, label_accuracy, get_data, inverse_transform, scale_data
 import numpy as np
 from statistics import mean, stdev
 import matplotlib.pyplot as plt
 
 X, Y = get_data("training_set.csv")
+X = scale_data(X)
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
 y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
 print(x_test.shape, y_test.shape)
@@ -23,8 +24,9 @@ def optimise_mlknn():
     print('best parameters :', classifier.best_params_, 'Best Hamming Loss: ',
           -1 * classifier.best_score_)
 
-# Optimal params are k=13, s=0.7
-model = MLkNN(k=13, s=0.7)
+optimise_mlknn()
+# Optimal params are k=19, s=0.5
+model = MLkNN(k=19, s=0.5)
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
 scores = cross_val_score(model, X, Y,
                          scoring=make_scorer(hamming_loss, greater_is_better=True),
@@ -62,7 +64,7 @@ plt.show()
 # Comparison with binary relevance knn
 # Mlknn incorporates MAP
 # See docs here: http://scikit.ml/api/skmultilearn.adapt.brknn.html
-brknn = BRkNNaClassifier(k=13)
+brknn = BRkNNaClassifier(k=19)
 scores = cross_val_score(brknn, X, Y,
                          scoring=make_scorer(hamming_loss, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
