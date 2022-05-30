@@ -3,6 +3,7 @@ import scipy.sparse
 from sklearn.preprocessing import MultiLabelBinarizer, StandardScaler
 import pandas as pd
 from scipy import sparse
+import matplotlib.pyplot as plt
 
 mlb = MultiLabelBinarizer()
 labels = list(range(1, 12))
@@ -154,3 +155,18 @@ def label_accuracy(y_true: list, y_predicted: list, label: int) -> float:
 def inverse_transform(to_transform: list) -> list:
     "Inverse transform from MLB"
     return mlb.inverse_transform(to_transform)
+
+def plot_label_accuracy(model_name: str, truth: np.ndarray, predictions: np.ndarray):
+    # Per label performance
+    results = {}
+    for i in range(1, 12):
+        results[str(i)] = label_accuracy(y_true=inverse_transform(truth),
+                                         y_predicted=inverse_transform(predictions), label=i)
+
+    names = list(results.keys())
+    values = list(results.values())
+    plt.bar(names, values, color='red')
+    plt.xlabel("Label number")
+    plt.ylabel("Correctly predicted proportion")
+    plt.title(model_name + " per-label performance")
+    plt.show()

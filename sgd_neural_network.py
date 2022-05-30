@@ -1,5 +1,6 @@
 from sklearn.neural_network import MLPClassifier
-from helper import get_data, partial_accuracy, inverse_transform, partial_accuracy_callable, scale_data
+from helper import get_data, partial_accuracy, inverse_transform, \
+    partial_accuracy_callable, scale_data, plot_label_accuracy
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 import json
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
@@ -63,3 +64,11 @@ scores_strict_accuracy = cross_val_score(neural_network, X, Y,
                          cv=cv, n_jobs=-1)
 
 print("The mean strict accuracy is ", mean(scores_strict_accuracy), "Stdev is ", stdev(scores_strict_accuracy))
+
+neural_network.fit(x_train, y_train)
+print("Predictions ", inverse_transform(neural_network.predict(x_test)))
+print("Truth: ", inverse_transform(y_test))
+for labels in inverse_transform(y_test):
+    if 11 in set(labels):
+        print("Truth has recommendation 11")
+plot_label_accuracy(model_name="SGD Neural Network", truth=y_test, predictions=neural_network.predict(x_test))

@@ -2,7 +2,7 @@ from skmultilearn.adapt import MLkNN, BRkNNaClassifier
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold, cross_val_score
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
 from helper import partial_accuracy, partial_accuracy_callable, \
-    count_mismatch_proportion, label_accuracy, get_data, inverse_transform, scale_data
+    count_mismatch_proportion, label_accuracy, get_data, inverse_transform, scale_data, plot_label_accuracy
 import numpy as np
 from statistics import mean, stdev
 import matplotlib.pyplot as plt
@@ -45,20 +45,8 @@ model.fit(x_train, y_train)
 predictions = model.predict(x_test)
 print("The proportion of length mismatches is ",
       count_mismatch_proportion(inverse_transform(predictions), inverse_transform(y_test)))
+plot_label_accuracy(model_name="MLkNN", truth=y_test, predictions=model.predict(x_test))
 
-# Per label performance
-results = {}
-for i in range(1, 12):
-    results[str(i)] = label_accuracy(y_true=inverse_transform(y_test),
-                                     y_predicted=inverse_transform(predictions), label=i)
-
-names = list(results.keys())
-values = list(results.values())
-plt.bar(names, values, color='red')
-plt.xlabel("Label number")
-plt.ylabel("Correctly predicted proportion")
-plt.title("MLKNN per-label performance")
-plt.show()
 # Comparison with binary relevance knn
 # Mlknn incorporates MAP
 # See docs here: http://scikit.ml/api/skmultilearn.adapt.brknn.html

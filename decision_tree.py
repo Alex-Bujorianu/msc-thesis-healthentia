@@ -5,7 +5,7 @@ from sklearn import tree
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from skmultilearn.problem_transform import BinaryRelevance
-from helper import partial_accuracy_callable
+from helper import partial_accuracy_callable, plot_label_accuracy
 
 from helper import get_data, partial_accuracy, label_accuracy, inverse_transform
 
@@ -61,15 +61,4 @@ tree_classifier.fit(x_train, y_train)
 predictions_tree = tree_classifier.predict(x_test)
 
 # Per label performance
-results = {}
-for i in range(1, 12):
-    results[str(i)] = label_accuracy(y_true=inverse_transform(y_test),
-                                     y_predicted=inverse_transform(predictions_tree), label=i)
-
-names = list(results.keys())
-values = list(results.values())
-plt.bar(names, values, color='red')
-plt.xlabel("Label number")
-plt.ylabel("Correctly predicted proportion")
-plt.title("Decision Tree per-label performance")
-plt.show()
+plot_label_accuracy(model_name="Decision tree", truth=y_test, predictions=predictions_tree)
