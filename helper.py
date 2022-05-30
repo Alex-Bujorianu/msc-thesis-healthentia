@@ -57,11 +57,15 @@ def partial_accuracy_callable(coder_1, coder_2):
      or a scipy sparse matrix.
      @param coder_2: same type as above """
     # Nothing can be simple in life,
-    # with numpy arrays and two different kinds of scipy sparse matrices being used interchangeably.
+    # with numpy arrays and two THREE different kinds of scipy sparse matrices being used interchangeably.
     # What a mess.
-    if (type(coder_1) == scipy.sparse._lil.lil_matrix) or (type(coder_1) == scipy.sparse._csr.csr_matrix):
+    if (type(coder_1) == scipy.sparse._lil.lil_matrix) \
+            or (type(coder_1) == scipy.sparse._csr.csr_matrix)\
+            or (type(coder_1) == scipy.sparse._csc.csc_matrix):
         coder_1 = coder_1.toarray()
-    if (type(coder_2) == scipy.sparse._lil.lil_matrix) or (type(coder_2) == scipy.sparse._csr.csr_matrix):
+    if (type(coder_2) == scipy.sparse._lil.lil_matrix) \
+            or (type(coder_2) == scipy.sparse._csr.csr_matrix)\
+            or (type(coder_2) == scipy.sparse._csc.csc_matrix):
         coder_2 = coder_2.toarray()
     # Make sure this code runs after the typecasting otherwise it will fail
     # Scipy matrices can fuck off

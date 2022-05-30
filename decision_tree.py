@@ -5,6 +5,7 @@ from sklearn import tree
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from skmultilearn.problem_transform import BinaryRelevance
+from helper import partial_accuracy_callable
 
 from helper import get_data, partial_accuracy, label_accuracy, inverse_transform
 
@@ -44,18 +45,20 @@ tree_classifier = BinaryRelevance(
         classifier = tree.DecisionTreeClassifier(criterion="gini", ccp_alpha=0.03),
         require_dense = [True, True])
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
+tree_classifier.fit(x_train, y_train)
+print(type(tree_classifier.predict(x_test)))
 scores = cross_val_score(tree_classifier, X, Y,
-                         scoring=make_scorer(hamming_loss, greater_is_better=False),
+                         scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
-print("The mean Hamming Loss of the BR decision tree is ", mean(scores),
+print("The mean partial accuracy of the BR decision tree is ", mean(scores),
       "\n", "The stdev is ", stdev(scores))
+scores_strict = cross_val_score(tree_classifier, X, Y,
+                         scoring=make_scorer(accuracy_score, greater_is_better=True),
+                         cv=kfold, n_jobs=-1)
+print("The mean strict accuracy of the decision tree is ", mean(scores_strict),
+      "The stdev of the strict accuracy is ", stdev(scores_strict))
 tree_classifier.fit(x_train, y_train)
 predictions_tree = tree_classifier.predict(x_test)
-print("The strict accuracy of the decision tree is is ",
-      accuracy_score(y_pred=predictions_tree, y_true=y_test))
-print("The partial accuracy of the decision tree is ",
-      partial_accuracy(inverse_transform(predictions_tree),
-                       inverse_transform(y_test)))
 
 # Per label performance
 results = {}

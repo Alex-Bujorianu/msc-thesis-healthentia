@@ -39,7 +39,8 @@ print("The mean partial accuracy is is ", mean(scores_partial_accuracy), "\n",
 scores_strict_accuracy = cross_val_score(model, X, Y,
                          scoring=make_scorer(accuracy_score, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
-print("The mean strict accuracy is ", mean(scores_strict_accuracy))
+print("The mean strict accuracy is ", mean(scores_strict_accuracy),
+      "The stdev strict accuracy of mlknn is ", stdev(scores_strict_accuracy))
 model.fit(x_train, y_train)
 predictions = model.predict(x_test)
 print("The proportion of length mismatches is ",
