@@ -1,7 +1,8 @@
 from skmultilearn.adapt import MLkNN, BRkNNaClassifier
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold, cross_val_score
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
-from helper import partial_accuracy, count_mismatch_proportion, label_accuracy, get_data, inverse_transform, scale_data
+from helper import partial_accuracy, partial_accuracy_callable, \
+    count_mismatch_proportion, label_accuracy, get_data, inverse_transform, scale_data
 import numpy as np
 from statistics import mean, stdev
 import matplotlib.pyplot as plt
@@ -17,7 +18,6 @@ def optimise_mlknn():
     # Grid search does 5-fold cross-validation
     # Hamming Loss is not in GridSearchCV; you have to pass the function
     classifier = GridSearchCV(MLkNN(), parameters, cv=5, n_jobs=-1, scoring=make_scorer(hamming_loss, greater_is_better=False))
-    print("x train: ", x_train, "\n", "y train: ", y_train)
     # No need to split, classifier already does cross-validation
     classifier.fit(X, Y)
     # The negative score is by design, not an error. See: https://stackoverflow.com/questions/44081222/hamming-loss-not-support-in-cross-val-score
@@ -28,25 +28,22 @@ optimise_mlknn()
 # Optimal params are k=19, s=0.5
 model = MLkNN(k=19, s=0.5)
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
-scores = cross_val_score(model, X, Y,
-                         scoring=make_scorer(hamming_loss, greater_is_better=False),
+scores_partial_accuracy = cross_val_score(model, X, Y,
+                         scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
-
+print(scores_partial_accuracy)
 # We use k-fold validation to have some idea of the variance
 # And to ensure there is no overfitting which would be indicated by high variance
-print("The mean performance is ", mean(scores), "\n",
-      "The stdev is ", stdev(scores))
-
-# Now for some intuitive metrics
+print("The mean partial accuracy is is ", mean(scores_partial_accuracy), "\n",
+      "The stdev is ", stdev(scores_partial_accuracy))
+scores_strict_accuracy = cross_val_score(model, X, Y,
+                         scoring=make_scorer(accuracy_score, greater_is_better=True),
+                         cv=kfold, n_jobs=-1)
+print("The mean strict accuracy is ", mean(scores_strict_accuracy))
 model.fit(x_train, y_train)
 predictions = model.predict(x_test)
-print("The strict accuracy is ", accuracy_score(y_pred=predictions, y_true=y_test))
-print("The partial accuracy of MLkNN is ",
-      partial_accuracy(inverse_transform(predictions),
-                       inverse_transform(y_test)))
 print("The proportion of length mismatches is ",
       count_mismatch_proportion(inverse_transform(predictions), inverse_transform(y_test)))
-print(inverse_transform(predictions), "\n", inverse_transform(y_test))
 
 # Per label performance
 results = {}
@@ -65,15 +62,13 @@ plt.show()
 # Mlknn incorporates MAP
 # See docs here: http://scikit.ml/api/skmultilearn.adapt.brknn.html
 brknn = BRkNNaClassifier(k=19)
-scores = cross_val_score(brknn, X, Y,
-                         scoring=make_scorer(hamming_loss, greater_is_better=False),
+scores_brknn = cross_val_score(brknn, X, Y,
+                         scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
-print("The mean Hamming Loss of Binary Relevance kNN is ", mean(scores),
-      "\n", "The stdev is ", stdev(scores))
-brknn.fit(x_train, y_train)
-predictions_br = brknn.predict(x_test)
-print("The strict accuracy (Binary Relevance) is ",
-      accuracy_score(y_pred=predictions_br, y_true=y_test))
-print("The partial accuracy of BR KNN is ",
-      partial_accuracy(inverse_transform(predictions_br),
-                       inverse_transform(y_test)))
+print("The mean partial accuracy of Binary Relevance kNN is ", mean(scores_brknn),
+      "\n", "The stdev is ", stdev(scores_brknn))
+scores_brknn_strict = cross_val_score(brknn, X, Y,
+                         scoring=make_scorer(accuracy_score, greater_is_better=True),
+                         cv=kfold, n_jobs=-1)
+print("The mean strict accuracy of Binary Relevance kNN is ", mean(scores_brknn_strict),
+      "The stdev is ", stdev(scores_brknn_strict))

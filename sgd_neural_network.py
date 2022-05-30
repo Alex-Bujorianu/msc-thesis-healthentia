@@ -62,4 +62,4 @@ scores_strict_accuracy = cross_val_score(neural_network, X, Y,
                          scoring=make_scorer(accuracy_score, greater_is_better=True),
                          cv=cv, n_jobs=-1)
 
-print("The strict accuracy is ", mean(scores_strict_accuracy))
+print("The mean strict accuracy is ", mean(scores_strict_accuracy), "Stdev is ", stdev(scores_strict_accuracy))
