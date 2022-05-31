@@ -9,6 +9,8 @@ def knowledge_model(input_features: dict) -> set:
     to_return = []
     scores = {}
     scores[8] = score_BMI(input_features['BMI'])
+    scores[9] = score_sleep(input_features['sleep'])
+    scores[10] = score_sleep_quality(input_features['sleep_quality'])
     for key, value in scores.items():
         if value > 0:
                 interim_results.append({'label': key, 'score': value})
@@ -42,5 +44,21 @@ def score_BMI(BMI: float) -> int:
     else:
         return 0
 
-print(knowledge_model({'BMI': 19}))
-print(knowledge_model({'BMI': 31}))
+def score_sleep(sleep: float) -> int:
+    if sleep < 7.5:
+        return 2
+    elif (sleep >= 7.5) and (sleep < 8.5):
+        return 1
+    else:
+        return 0
+
+def score_sleep_quality(sleep_quality: float) -> int:
+    if sleep_quality < 0.5:
+        return 2
+    elif (sleep_quality >= 0.5) and (sleep_quality < 0.66):
+        return 1
+    else:
+        return 0
+
+print(knowledge_model({'BMI': 19, 'sleep': 7.1, 'sleep_quality': 0.75}))
+print(knowledge_model({'BMI': 31, 'sleep': 9.0, 'sleep_quality': 0.4}))
