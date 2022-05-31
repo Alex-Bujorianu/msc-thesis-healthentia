@@ -36,6 +36,9 @@ def truncate(list_of_recommendations) -> list:
         for rec in list_of_recommendations:
             if rec['score'] >= 2:
                 new_list.append(rec)
+        # Maximum 5 recommendations
+        if len(new_list) > 5:
+            new_list = new_list[0:5]
         return new_list
     else:
         return list_of_recommendations
