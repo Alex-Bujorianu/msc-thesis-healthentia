@@ -1,6 +1,6 @@
 from sklearn.neural_network import MLPClassifier
 from helper import get_data, partial_accuracy, inverse_transform, \
-    partial_accuracy_callable, standardise_data, plot_label_accuracy
+    partial_accuracy_callable, standardise_data, plot_label_accuracy, count_mismatch_proportion
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 import json
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
@@ -66,7 +66,9 @@ scores_strict_accuracy = cross_val_score(neural_network, X, Y,
 print("The mean strict accuracy is ", mean(scores_strict_accuracy), "Stdev is ", stdev(scores_strict_accuracy))
 
 neural_network.fit(x_train, y_train)
-print("Predictions ", inverse_transform(neural_network.predict(x_test)))
+predictions = neural_network.predict(x_test)
+print("The proportion of length mismatches is ", count_mismatch_proportion(inverse_transform(predictions), inverse_transform(y_test)))
+print("Predictions ", inverse_transform(predictions))
 print("Truth: ", inverse_transform(y_test))
 count = 0
 for labels in inverse_transform(y_test):

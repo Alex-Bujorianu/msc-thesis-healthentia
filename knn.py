@@ -51,6 +51,8 @@ plot_label_accuracy(model_name="MLkNN", truth=y_test, predictions=model.predict(
 # Mlknn incorporates MAP
 # See docs here: http://scikit.ml/api/skmultilearn.adapt.brknn.html
 brknn = BRkNNaClassifier(k=19)
+brknn.fit(x_train, y_train)
+predictions_brknn = brknn.predict(x_test)
 scores_brknn = cross_val_score(brknn, X, Y,
                          scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
@@ -61,3 +63,5 @@ scores_brknn_strict = cross_val_score(brknn, X, Y,
                          cv=kfold, n_jobs=-1)
 print("The mean strict accuracy of Binary Relevance kNN is ", mean(scores_brknn_strict),
       "The stdev is ", stdev(scores_brknn_strict))
+print("The proportion of length mismatches (BRkNN) is ",
+      count_mismatch_proportion(inverse_transform(predictions_brknn), inverse_transform(y_test)))

@@ -5,7 +5,7 @@ from sklearn import tree
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from skmultilearn.problem_transform import BinaryRelevance
-from helper import partial_accuracy_callable, plot_label_accuracy
+from helper import partial_accuracy_callable, plot_label_accuracy, count_mismatch_proportion
 from helper import get_data, partial_accuracy, label_accuracy, inverse_transform
 
 X, Y = get_data("training_set.csv")
@@ -58,6 +58,9 @@ print("The mean strict accuracy of the decision tree is ", mean(scores_strict),
       "The stdev of the strict accuracy is ", stdev(scores_strict))
 tree_classifier.fit(x_train, y_train)
 predictions_tree = tree_classifier.predict(x_test)
+
+print("The proportion of length mismatches is ",
+      count_mismatch_proportion(inverse_transform(predictions_tree), inverse_transform(y_test)))
 
 # Per label performance
 plot_label_accuracy(model_name="Decision tree", truth=y_test, predictions=predictions_tree)

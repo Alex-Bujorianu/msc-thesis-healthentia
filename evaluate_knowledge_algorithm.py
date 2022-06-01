@@ -1,5 +1,5 @@
 from knowledge_algorithm import knowledge_model
-from helper import get_data, partial_accuracy, inverse_transform
+from helper import get_data, partial_accuracy, count_mismatch_proportion
 import pandas as pd
 
 X, Y = get_data("training_set.csv", format="pandas")
@@ -28,3 +28,5 @@ for i in range(len(X['calories'])):
     predictions.append(knowledge_model(patient))
 
 print("Partial accuracy: ", partial_accuracy(predictions, Y))
+print("Mismatch proportions", count_mismatch_proportion(predictions, Y))
+print("Predictions: ", predictions, "\n", "Truth: ", Y)
