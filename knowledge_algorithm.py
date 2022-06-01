@@ -16,7 +16,8 @@ def knowledge_model(input_features: dict) -> set:
     scores[4] = score_intensity(total_exercise=input_features['total_exercise'],
                                 moderate_exercise=input_features['moderate_exercise'],
                                 intense_exercise=input_features['intense_exercise'])
-    scores[5] = score_sat_fat(sat_fat=input_features['sat_fat'], calories=input_features['calories'])
+    scores[5] = score_sat_fat(sat_fat=input_features['sat_fat'], calories=input_features['calories'],
+                              chd=input_features['chd'])
     scores[6] = score_sugar(input_features['sugar'])
     scores[7] = score_fibre(fibre=input_features['fibre'], gender=input_features['gender'],
                             diabetes=input_features['diabetes'])
@@ -110,14 +111,16 @@ def score_intensity(total_exercise: float, moderate_exercise: float, intense_exe
         else:
             return 2
 
-def score_sat_fat(sat_fat: float, calories: float) -> int:
+def score_sat_fat(sat_fat: float, calories: float, chd: int) -> int:
+    "1 represents having CHD. Can return -1."
     sat_fat_proportion = sat_fat * 9 / calories
+    score = chd
     if sat_fat_proportion > 0.15:
-        return 2
+        return score + 2
     elif (sat_fat_proportion <= 0.15) and (sat_fat_proportion >= 0.1):
-        return 1
+        return score + 1
     else:
-        return 0
+        return score - 1
 
 def score_sugar(sugar: float) -> int:
     if sugar <= 25:
@@ -167,11 +170,3 @@ def score_sleep_quality(sleep_quality: float) -> int:
     else:
         return 0
 
-print(knowledge_model({'BMI': 19, 'sleep': 7.1, 'sleep_quality': 0.75, 'total_exercise': 160,
-                       'moderate_exercise': 50, 'intense_exercise': 20,
-                       'sat_fat': 20, 'calories': 2500, 'sugar': 100, 'gender': 1, 'fibre': 32, 'diabetes': 0,
-                       'core_proportion': 0.35, 'strength_proportion': 0.42}))
-print(knowledge_model({'BMI': 31, 'sleep': 9.0, 'sleep_quality': 0.4, 'total_exercise': 90,
-                       'moderate_exercise': 30, 'intense_exercise': 10,
-                       'sat_fat': 25, 'calories': 2200, 'sugar': 24, 'gender': 0, 'fibre': 26, 'diabetes': 1,
-                       'core_proportion': 0.2, 'strength_proportion': 0.3}))
