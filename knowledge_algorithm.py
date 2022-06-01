@@ -9,6 +9,10 @@ def knowledge_model(input_features: dict) -> set:
     to_return = []
     scores = {}
     scores[1] = score_exercise(input_features['total_exercise'])
+    scores[2] = score_core(total_exercise=input_features['total_exercise'],
+                           core_proportion=input_features['core_proportion'])
+    scores[3] = score_strength(total_exercise=input_features['total_exercise'],
+                               strength_proportion=input_features['strength_proportion'])
     scores[5] = score_sat_fat(sat_fat=input_features['sat_fat'], calories=input_features['calories'])
     scores[6] = score_sugar(input_features['sugar'])
     scores[7] = score_fibre(fibre=input_features['fibre'], gender=input_features['gender'],
@@ -50,6 +54,40 @@ def score_exercise(total_exercise: float) -> int:
         return 1
     else:
         return 0
+
+def score_strength(total_exercise: float, strength_proportion: float) -> int:
+    if total_exercise < 100:
+        # Patient does not do enough exercise in general
+        # It is recommendation 1 they need, not this one
+        return 0
+    elif (total_exercise >= 100) and (total_exercise < 150):
+        # Same as above
+        return 0
+    else:
+        strength_duration = total_exercise * strength_proportion
+        if strength_duration < 50:
+            return 2
+        elif (strength_duration >= 50) and (strength_duration < 75):
+            return 1
+        else:
+            return 0
+
+def score_core(total_exercise: float, core_proportion: float) -> int:
+    if total_exercise < 100:
+        # Patient does not do enough exercise in general
+        # It is recommendation 1 they need, not this one
+        return 0
+    elif (total_exercise >= 100) and (total_exercise < 150):
+        # Same as above
+        return 0
+    else:
+        core_duration = total_exercise * core_proportion
+        if core_duration < 60:
+            return 2
+        elif (core_duration >= 60) and (core_duration < 75):
+            return 1
+        else:
+            return 0
 
 def score_sat_fat(sat_fat: float, calories: float) -> int:
     sat_fat_proportion = sat_fat * 9 / calories
