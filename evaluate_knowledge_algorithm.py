@@ -1,5 +1,5 @@
 from knowledge_algorithm import knowledge_model
-from helper import get_data, partial_accuracy, count_mismatch_proportion
+from helper import get_data, partial_accuracy, count_mismatch_proportion, plot_label_accuracy
 import pandas as pd
 
 X, Y = get_data("training_set.csv", format="pandas")
@@ -30,3 +30,4 @@ for i in range(len(X['calories'])):
 print("Partial accuracy: ", partial_accuracy(predictions, Y))
 print("Mismatch proportions", count_mismatch_proportion(predictions, Y))
 print("Predictions: ", predictions, "\n", "Truth: ", Y)
+plot_label_accuracy(model_name="Knowledge algorithm", predictions=predictions, truth=Y, type="normal")

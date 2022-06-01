@@ -167,12 +167,12 @@ def inverse_transform(to_transform: list) -> list:
     "Inverse transform from MLB"
     return mlb.inverse_transform(to_transform)
 
-def plot_label_accuracy(model_name: str, truth: np.ndarray, predictions: np.ndarray):
+def plot_label_accuracy(model_name: str, truth: np.ndarray, predictions: np.ndarray, type="numpy"):
     # Per label performance
     results = {}
     for i in range(1, 12):
-        results[str(i)] = label_accuracy(y_true=inverse_transform(truth),
-                                         y_predicted=inverse_transform(predictions), label=i)
+        results[str(i)] = label_accuracy(y_true=inverse_transform(truth) if type=="numpy" else truth,
+                                         y_predicted=inverse_transform(predictions) if type=="numpy" else predictions, label=i)
 
     names = list(results.keys())
     values = list(results.values())

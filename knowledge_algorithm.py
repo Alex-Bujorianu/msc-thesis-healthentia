@@ -38,12 +38,12 @@ def knowledge_model(input_features: dict) -> set:
     return set(to_return)
 
 def truncate(list_of_recommendations) -> list:
-    # Purpose of this function is to remove amber recommendations if the list of recs is bigger than 3
+    # Purpose of this function is to remove amber recommendations from 4th or 5th recs
     new_list = []
     if len(list_of_recommendations) > 3:
-        for rec in list_of_recommendations:
-            if rec['score'] >= 2:
-                new_list.append(rec)
+        for i in range(len(list_of_recommendations)):
+            if (i < 3) or list_of_recommendations[i]['score'] >= 2:
+                new_list.append(list_of_recommendations[i])
         # Maximum 5 recommendations
         if len(new_list) > 5:
             new_list = new_list[0:5]
