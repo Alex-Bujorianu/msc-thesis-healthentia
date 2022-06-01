@@ -1,6 +1,6 @@
 from sklearn.neural_network import MLPClassifier
 from my_nn import my_nn
-from helper import get_data, partial_accuracy, inverse_transform, partial_accuracy_callable, generate_neurons, scale_data
+from helper import get_data, standardise_data, partial_accuracy_callable, generate_neurons
 from sklearn_genetic.plots import plot_fitness_evolution
 import matplotlib.pyplot as plt
 from sklearn_genetic import GASearchCV
@@ -15,7 +15,8 @@ import os
 
 X, Y = get_data("training_set.csv")
 # Make sure to scale X – very important!
-X = scale_data(X)
+# Standard scaling works better for the NN than normalisation
+X = standardise_data(X)
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
 y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
 

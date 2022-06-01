@@ -1,6 +1,6 @@
 from sklearn.neural_network import MLPClassifier
 from helper import get_data, partial_accuracy, inverse_transform, \
-    partial_accuracy_callable, scale_data, plot_label_accuracy
+    partial_accuracy_callable, standardise_data, plot_label_accuracy
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 import json
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 X, Y = get_data("training_set.csv")
 # Make sure to scale X – very important!
-X = scale_data(X)
+X = standardise_data(X)
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
 y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
 
@@ -24,7 +24,7 @@ neural_network = MLPClassifier(solver='sgd', activation='relu', learning_rate_in
                                hidden_layer_sizes=tuple(params['hidden_layer_sizes']),
                                power_t=params['power_t'],
                                momentum=params['momentum'],
-                               alpha=0.006, #seems like a good value from the graph
+                               alpha=0.0005, #best value from the graph
                                random_state=101)
 
 scores = cross_val_score(neural_network, X, Y,
@@ -68,7 +68,9 @@ print("The mean strict accuracy is ", mean(scores_strict_accuracy), "Stdev is ",
 neural_network.fit(x_train, y_train)
 print("Predictions ", inverse_transform(neural_network.predict(x_test)))
 print("Truth: ", inverse_transform(y_test))
+count = 0
 for labels in inverse_transform(y_test):
     if 11 in set(labels):
-        print("Truth has recommendation 11")
+        count += 1
+print("label 11 comes up ", count, " times")
 plot_label_accuracy(model_name="SGD Neural Network", truth=y_test, predictions=neural_network.predict(x_test))

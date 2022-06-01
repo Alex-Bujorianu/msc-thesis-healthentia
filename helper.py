@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse
-from sklearn.preprocessing import MultiLabelBinarizer, StandardScaler
+from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler, StandardScaler
 import pandas as pd
 from scipy import sparse
 import matplotlib.pyplot as plt
@@ -24,8 +24,13 @@ def generate_neurons(max_depth: int, average_neurons_per_layer: int) -> list:
         to_return.append(my_tuple)
     return to_return
 
-def scale_data(X: np.ndarray) -> np.ndarray:
-    scaler = StandardScaler(with_mean=True, copy=True)
+def normalise_data(X: np.ndarray) -> np.ndarray:
+    scaler = MinMaxScaler(copy=True)
+    scaler.fit(X)
+    return scaler.transform(X)
+
+def standardise_data(X: np.ndarray) -> np.ndarray:
+    scaler = StandardScaler(copy=True)
     scaler.fit(X)
     return scaler.transform(X)
 
@@ -93,22 +98,26 @@ def partial_accuracy_callable(coder_1, coder_2):
         total_accuracy += subtotal_accuracy
     return total_accuracy / len(coder_1)
 
-def get_data(data_file: str):
+def get_data(data_file: str, format="numpy"):
     """
     A function that extracts and transforms the data.
     :param data_file: A string representing the filename
-    :return: X, a multidimensional numpy array, and Y, a binary numpy array
+    :return: X, a multidimensional numpy array (if numpy is chosen; else pandas dataframe),
+    and Y, a binary numpy array (else list of lists)
     """
     training_set = pd.read_csv("Data/" + data_file)
     # Drop nuisance variables
-    training_set.drop(labels=['participant_id', 'gender', 'Coder', 'Explanation'], axis=1, inplace=True)
+    training_set.drop(labels=['participant_id', 'Coder', 'Explanation'], axis=1, inplace=True)
     # Don't forget to transform these variables to 0/1
     training_set['diabetes'] = [1 if x == 'yes' else 0 for x in training_set['diabetes']]
     training_set['chd'] = [1 if x == 'yes' else 0 for x in training_set['chd']]
-    X = training_set.drop(labels=['Labels'], axis=1).to_numpy()
+    training_set['gender'] = [1 if x == 'male' else 0 for x in training_set['gender']]
+    X = training_set.drop(labels=['Labels'], axis=1)
     Y = [[int(y) for y in x.split(",")] for x in training_set['Labels']]
-    Y_transformed = mlb.transform(Y)
-    return X, Y_transformed
+    if format=="numpy":
+        Y = mlb.transform(Y)
+        X = X.to_numpy()
+    return X, Y
 
 def count_mismatch_proportion(list1, list2) -> float:
     if len(list1) != len(list2):
