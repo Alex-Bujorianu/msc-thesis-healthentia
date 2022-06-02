@@ -5,7 +5,7 @@ from sklearn import tree
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from skmultilearn.problem_transform import BinaryRelevance
-from helper import partial_accuracy_callable, plot_label_accuracy, count_mismatch_proportion
+from helper import partial_accuracy_callable, plot_label_accuracy_cv, count_mismatch_proportion
 from helper import get_data, partial_accuracy, label_accuracy, inverse_transform, cross_validate
 
 X, Y = get_data("training_set.csv")
@@ -44,8 +44,6 @@ tree_classifier = BinaryRelevance(
         classifier = tree.DecisionTreeClassifier(criterion="gini", ccp_alpha=0.03),
         require_dense = [True, True])
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
-tree_classifier.fit(x_train, y_train)
-print(type(tree_classifier.predict(x_test)))
 scores = cross_val_score(tree_classifier, X, Y,
                          scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
@@ -56,11 +54,10 @@ scores_strict = cross_val_score(tree_classifier, X, Y,
                          cv=kfold, n_jobs=-1)
 print("The mean strict accuracy of the decision tree is ", mean(scores_strict),
       "The stdev of the strict accuracy is ", stdev(scores_strict))
+# Per label performance, now with cross-validation!
+plot_label_accuracy_cv(model_name="Decision tree", model=tree_classifier, Y=Y, X=X)
 tree_classifier.fit(x_train, y_train)
 predictions_tree = tree_classifier.predict(x_test)
 
 print("The proportion of length mismatches is ",
       count_mismatch_proportion(inverse_transform(predictions_tree), inverse_transform(y_test)))
-
-# Per label performance
-plot_label_accuracy(model_name="Decision tree", truth=y_test, predictions=predictions_tree)

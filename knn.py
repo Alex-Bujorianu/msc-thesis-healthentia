@@ -2,7 +2,8 @@ from skmultilearn.adapt import MLkNN, BRkNNaClassifier
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold, cross_val_score
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
 from helper import partial_accuracy, partial_accuracy_callable, \
-    count_mismatch_proportion, label_accuracy, get_data, inverse_transform, normalise_data, plot_label_accuracy
+    count_mismatch_proportion, label_accuracy, get_data, inverse_transform, normalise_data, \
+    plot_label_accuracy, plot_label_accuracy_cv
 import numpy as np
 from statistics import mean, stdev
 import matplotlib.pyplot as plt
@@ -45,7 +46,7 @@ model.fit(x_train, y_train)
 predictions = model.predict(x_test)
 print("The proportion of length mismatches is ",
       count_mismatch_proportion(inverse_transform(predictions), inverse_transform(y_test)))
-plot_label_accuracy(model_name="MLkNN", truth=y_test, predictions=model.predict(x_test))
+plot_label_accuracy_cv(model_name="MLkNN", model=MLkNN(k=19, s=0.5), Y=Y, X=X)
 
 # Comparison with binary relevance knn
 # Mlknn incorporates MAP

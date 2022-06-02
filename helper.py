@@ -4,6 +4,7 @@ from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler, StandardSca
 import pandas as pd
 from scipy import sparse
 import matplotlib.pyplot as plt
+from statistics import mean
 
 mlb = MultiLabelBinarizer()
 labels = list(range(1, 12))
@@ -182,10 +183,40 @@ def plot_label_accuracy(model_name: str, truth: np.ndarray, predictions: np.ndar
     plt.title(model_name + " per-label performance")
     plt.show()
 
+def plot_label_accuracy_cv(model, X, Y, model_name: str):
+    """
+    Like the function above, but includes cross-validation
+    :param model: An sklearn-like model
+    :param X: The input features
+    :param Y: The labels
+    :return: Plots a graph
+    """
+    list_of_cv_predictions = cross_validate(k=5, X=X, Y=Y, model=model)
+    list_of_results = []
+    for dictionary in list_of_cv_predictions:
+        results = {}
+        for i in range(1, 12):
+            results[str(i)] = label_accuracy(y_true=inverse_transform(dictionary['Truth']),
+                                         y_predicted=inverse_transform(dictionary['Predictions']), label=i)
+        list_of_results.append(results)
+
+    print(list_of_results)
+    final_results = {}
+    for i in range(1, 12):
+        final_results[str(i)] = mean([d[str(i)] for d in list_of_results])
+    print(final_results)
+    values = list(final_results.values())
+    names = list(final_results.keys())
+    plt.bar(names, values, color='red')
+    plt.xlabel("Label number")
+    plt.ylabel("Correctly predicted proportion")
+    plt.title(model_name + " per-label performance")
+    plt.show()
+
 def cross_validate(k: int, X: np.ndarray, Y: np.ndarray, model) -> list:
     """
     This function is almost but not exactly identical to KFold from sklearn.
-    It is intended for use by plot_label_accuracy()
+    It is intended for use by plot_label_accuracy_cv()
     :param k: The k in k-fold.
     :param X: The numpy array representing the input features
     :param Y: The numpy array representing the correct output, as a binary mask
@@ -207,12 +238,13 @@ def cross_validate(k: int, X: np.ndarray, Y: np.ndarray, model) -> list:
     for i in range(split_number, X.shape[0]+split_number, split_number):
         X_test = X[start:i]
         X_train = np.concatenate((X[i:length], X[0:start]))
-        print("Length of first part: ", X[i:length].shape[0], "Length of second part ", X[0:start].shape[0])
-        print("Length of X train: ", X_train.shape[0])
-        print("Length of X test: ", X_test.shape[0])
+        # print("Length of first part: ", X[i:length].shape[0], "Length of second part ", X[0:start].shape[0])
+        # print("Length of X train: ", X_train.shape[0])
+        # print("Length of X test: ", X_test.shape[0])
         Y_test = Y[start:i]
         Y_train = np.concatenate((Y[i:length], Y[0:start]))
         start += split_number
         model.fit(X_train, Y_train)
         predictions.append({"Predictions": model.predict(X_test), "Truth": Y_test})
+    assert len(predictions) == k
     return predictions
