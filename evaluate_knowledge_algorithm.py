@@ -1,6 +1,8 @@
 from knowledge_algorithm import knowledge_model
-from helper import get_data, partial_accuracy, count_mismatch_proportion, plot_label_accuracy
+from helper import get_data, partial_accuracy, partial_accuracy_callable, \
+    count_mismatch_proportion, plot_label_accuracy, cross_validate
 import pandas as pd
+from statistics import mean, stdev
 
 X, Y = get_data("training_set.csv", format="pandas")
 print(Y)
@@ -25,7 +27,8 @@ for i in range(len(X['calories'])):
                'diabetes': X['diabetes'][i],
                'chd': X['chd'][i]
                }
-    predictions.append(knowledge_model(patient))
+    predictor = knowledge_model()
+    predictions.append(predictor.predict(patient))
 
 print("Partial accuracy: ", partial_accuracy(predictions, Y))
 print("Mismatch proportions", count_mismatch_proportion(predictions, Y))
