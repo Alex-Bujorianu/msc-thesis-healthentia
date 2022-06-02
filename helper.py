@@ -167,12 +167,12 @@ def inverse_transform(to_transform: list) -> list:
     "Inverse transform from MLB"
     return mlb.inverse_transform(to_transform)
 
-def plot_label_accuracy(model_name: str, truth: np.ndarray, predictions: np.ndarray, type="numpy"):
+def plot_label_accuracy(model_name: str, truth: np.ndarray, predictions: np.ndarray):
     # Per label performance
     results = {}
     for i in range(1, 12):
-        results[str(i)] = label_accuracy(y_true=inverse_transform(truth) if type=="numpy" else truth,
-                                         y_predicted=inverse_transform(predictions) if type=="numpy" else predictions, label=i)
+        results[str(i)] = label_accuracy(y_true=inverse_transform(truth) if type(truth)!=list else truth,
+                                         y_predicted=inverse_transform(predictions) if type(predictions)!=list else predictions, label=i)
 
     names = list(results.keys())
     values = list(results.values())
@@ -181,3 +181,38 @@ def plot_label_accuracy(model_name: str, truth: np.ndarray, predictions: np.ndar
     plt.ylabel("Correctly predicted proportion")
     plt.title(model_name + " per-label performance")
     plt.show()
+
+def cross_validate(k: int, X: np.ndarray, Y: np.ndarray, model) -> list:
+    """
+    This function is almost but not exactly identical to KFold from sklearn.
+    It is intended for use by plot_label_accuracy()
+    :param k: The k in k-fold.
+    :param X: The numpy array representing the input features
+    :param Y: The numpy array representing the correct output, as a binary mask
+    :param model: An sklearn-like model
+    :return: A list of predictions (not scores!) of length k
+    """
+    if type(k) != int:
+        raise TypeError("k needs to be an integer")
+    if X.shape[0] != Y.shape[0]:
+        raise TypeError("Lengths need to be the same")
+    print(X.shape[0], Y.shape[0])
+    if X.shape[0] % k != 0:
+        raise Exception("Pick a more sensible k value. The chosen k value does not divide the data evenly.")
+    length = X.shape[0]
+    split_number = int(length / k)
+    start = 0
+    predictions = []
+    # The annoying range function is exclusive of the last number
+    for i in range(split_number, X.shape[0]+split_number, split_number):
+        X_test = X[start:i]
+        X_train = np.concatenate((X[i:length], X[0:start]))
+        print("Length of first part: ", X[i:length].shape[0], "Length of second part ", X[0:start].shape[0])
+        print("Length of X train: ", X_train.shape[0])
+        print("Length of X test: ", X_test.shape[0])
+        Y_test = Y[start:i]
+        Y_train = np.concatenate((Y[i:length], Y[0:start]))
+        start += split_number
+        model.fit(X_train, Y_train)
+        predictions.append({"Predictions": model.predict(X_test), "Truth": Y_test})
+    return predictions

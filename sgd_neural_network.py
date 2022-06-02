@@ -1,6 +1,7 @@
 from sklearn.neural_network import MLPClassifier
 from helper import get_data, partial_accuracy, inverse_transform, \
-    partial_accuracy_callable, standardise_data, plot_label_accuracy, count_mismatch_proportion
+    partial_accuracy_callable, standardise_data, plot_label_accuracy, \
+    count_mismatch_proportion, cross_validate
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 import json
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
@@ -30,6 +31,7 @@ neural_network = MLPClassifier(solver='sgd', activation='relu', learning_rate_in
 scores = cross_val_score(neural_network, X, Y,
                          scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
                          cv=cv, n_jobs=-1)
+
 
 def plot_alpha():
     alphas = np.arange(start=0.0001, stop=0.0009, step=0.0001, dtype='float')
@@ -76,3 +78,18 @@ for labels in inverse_transform(y_test):
         count += 1
 print("label 11 comes up ", count, " times")
 plot_label_accuracy(model_name="SGD Neural Network", truth=y_test, predictions=neural_network.predict(x_test))
+predictions_cross_val = cross_validate(k=5, X=X, Y=Y, model=MLPClassifier(solver='sgd', activation='relu', learning_rate_init=params['learning_rate_init'],
+                               hidden_layer_sizes=tuple(params['hidden_layer_sizes']),
+                               power_t=params['power_t'],
+                               momentum=params['momentum'],
+                               alpha=0.0005, #best value from the graph
+                               random_state=101))
+partial_accuracy_scores = []
+scores = cross_val_score(neural_network, X, Y,
+                         scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
+                         cv=KFold(n_splits=5, shuffle=False), n_jobs=-1)
+for prediction in predictions_cross_val:
+    partial_accuracy_scores.append(partial_accuracy(inverse_transform(prediction['Truth']),
+                                                    inverse_transform(prediction['Predictions'])))
+print(partial_accuracy_scores)
+print("Scores by sklearn function ", scores)

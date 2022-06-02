@@ -6,7 +6,7 @@ from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from skmultilearn.problem_transform import BinaryRelevance
 from helper import partial_accuracy_callable, plot_label_accuracy, count_mismatch_proportion
-from helper import get_data, partial_accuracy, label_accuracy, inverse_transform
+from helper import get_data, partial_accuracy, label_accuracy, inverse_transform, cross_validate
 
 X, Y = get_data("training_set.csv")
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
