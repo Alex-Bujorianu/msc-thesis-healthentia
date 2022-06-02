@@ -37,6 +37,17 @@ def standardise_data(X: np.ndarray) -> np.ndarray:
     scaler.fit(X)
     return scaler.transform(X)
 
+def strict_accuracy(coder_1, coder_2):
+    if len(coder_1) != len(coder_2):
+        raise Exception("Lengths have to be the same")
+    count_correct = 0
+    for i in range(len(coder_1)):
+        coder_1[i] = set(coder_1[i])
+        coder_2[i] = set(coder_2[i])
+        if coder_1[i] == coder_2[i]:
+            count_correct += 1
+    return count_correct / len(coder_1)
+
 def partial_accuracy(coder_1, coder_2):
     "This function is commutative: the order doesn’t matter."
     if len(coder_1) != len(coder_2):
