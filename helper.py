@@ -134,6 +134,10 @@ def get_data(data_file: str, format="numpy"):
     return X, Y
 
 def count_mismatch_proportion(list1, list2) -> float:
+    if type(list1) != list:
+        list1 = inverse_transform(list1)
+    if type(list2) != list:
+        list2 = inverse_transform(list2)
     if len(list1) != len(list2):
         raise TypeError("Length mismatch")
     count = 0
@@ -142,6 +146,25 @@ def count_mismatch_proportion(list1, list2) -> float:
             count += 1
     return count / len(list1)
 
+def count_length_ratio(truth, predictions) -> float:
+    """
+    Counts the ratio of the length of recommendations in one list compared to the other.
+    Useful to see whether an algorithm is giving too many or too few recommendations (or both)
+    A ratio above 1 indicates too many recommendations, < 1 too few, and 1 both.
+    """
+    # The following typecasts are required to work with sklearn's cross-validation
+    if type(truth) != list:
+        truth = inverse_transform(truth)
+    if type(predictions) != list:
+        predictions = inverse_transform(predictions)
+    if len(truth) != len(predictions):
+        raise TypeError("Length mismatch")
+    total_truth = 0
+    total_predictions = 0
+    for i in range(len(truth)):
+        total_truth += len(truth[i])
+        total_predictions += len(predictions[i])
+    return total_predictions / total_truth
 
 def count_labels(label: int, data: list) -> int:
     count = 0
