@@ -162,8 +162,10 @@ def count_length_ratio(truth, predictions) -> float:
     total_truth = 0
     total_predictions = 0
     for i in range(len(truth)):
+        #print("True length", len(truth[i]))
         total_truth += len(truth[i])
         total_predictions += len(predictions[i])
+        #print("Predicted length ", len(predictions[i]))
     return total_predictions / total_truth
 
 def count_labels(label: int, data: list) -> int:

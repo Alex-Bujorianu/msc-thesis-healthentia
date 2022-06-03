@@ -1,7 +1,7 @@
 from sklearn.neural_network import MLPClassifier
 from helper import get_data, partial_accuracy, inverse_transform, \
     partial_accuracy_callable, standardise_data, plot_label_accuracy_cv, \
-    count_mismatch_proportion, cross_validate
+    count_mismatch_proportion, cross_validate, count_length_ratio
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 import json
 from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
@@ -67,16 +67,12 @@ scores_strict_accuracy = cross_val_score(neural_network, X, Y,
 
 print("The mean strict accuracy is ", mean(scores_strict_accuracy), "Stdev is ", stdev(scores_strict_accuracy))
 plot_label_accuracy_cv(model_name="SGD Neural Network", model=neural_network, X=X, Y=Y)
-neural_network.fit(x_train, y_train)
-predictions = neural_network.predict(x_test)
-print("The proportion of length mismatches is ", count_mismatch_proportion(inverse_transform(predictions), inverse_transform(y_test)))
-print("Predictions ", inverse_transform(predictions))
-print("Truth: ", inverse_transform(y_test))
-count = 0
-for labels in inverse_transform(y_test):
-    if 11 in set(labels):
-        count += 1
-print("label 11 comes up ", count, " times")
+print("The proportion of length mismatches is ", -1 * mean(cross_val_score(neural_network, X, Y,
+                         scoring=make_scorer(count_mismatch_proportion, greater_is_better=False),
+                         cv=cv, n_jobs=-1)))
+print("The length ratio is ", mean(cross_val_score(neural_network, X, Y,
+                         scoring=make_scorer(count_length_ratio, greater_is_better=True),
+                         cv=cv, n_jobs=-1)))
 predictions_cross_val = cross_validate(k=5, X=X, Y=Y, model=MLPClassifier(solver='sgd', activation='relu', learning_rate_init=params['learning_rate_init'],
                                hidden_layer_sizes=tuple(params['hidden_layer_sizes']),
                                power_t=params['power_t'],

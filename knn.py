@@ -75,3 +75,8 @@ print("The proportion of length mismatches (BRknn) is ", -1 * mean(cross_val_sco
 print("The length ratio (BRknn) is ", mean(cross_val_score(brknn, X, Y,
                          scoring=make_scorer(count_length_ratio, greater_is_better=True),
                          cv=kfold, n_jobs=-1)))
+# brknn.fit(x_train, y_train)
+# print("A quick sanity check, the length ratio is: ",
+#       count_length_ratio(truth=y_test, predictions=brknn.predict(x_test)))
+# print("Truth: ", inverse_transform(y_test),
+#       "Predictions ", inverse_transform(brknn.predict(x_test)))
