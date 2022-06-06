@@ -4,7 +4,7 @@ from helper import get_data, partial_accuracy, inverse_transform, \
     count_mismatch_proportion, cross_validate, count_length_ratio
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 import json
-from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
+from sklearn.metrics import hamming_loss, make_scorer, accuracy_score, multilabel_confusion_matrix
 from statistics import mean, stdev
 import numpy as np
 import matplotlib.pyplot as plt
@@ -73,18 +73,22 @@ print("The proportion of length mismatches is ", -1 * mean(cross_val_score(neura
 print("The length ratio is ", mean(cross_val_score(neural_network, X, Y,
                          scoring=make_scorer(count_length_ratio, greater_is_better=True),
                          cv=cv, n_jobs=-1)))
-predictions_cross_val = cross_validate(k=5, X=X, Y=Y, model=MLPClassifier(solver='sgd', activation='relu', learning_rate_init=params['learning_rate_init'],
-                               hidden_layer_sizes=tuple(params['hidden_layer_sizes']),
-                               power_t=params['power_t'],
-                               momentum=params['momentum'],
-                               alpha=0.0005, #best value from the graph
-                               random_state=101))
-partial_accuracy_scores = []
-scores = cross_val_score(neural_network, X, Y,
-                         scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
-                         cv=KFold(n_splits=5, shuffle=False), n_jobs=-1)
-for prediction in predictions_cross_val:
-    partial_accuracy_scores.append(partial_accuracy(inverse_transform(prediction['Truth']),
-                                                    inverse_transform(prediction['Predictions'])))
-print(partial_accuracy_scores)
-print("Scores by sklearn function ", scores)
+# predictions_cross_val = cross_validate(k=5, X=X, Y=Y, model=MLPClassifier(solver='sgd', activation='relu', learning_rate_init=params['learning_rate_init'],
+#                                hidden_layer_sizes=tuple(params['hidden_layer_sizes']),
+#                                power_t=params['power_t'],
+#                                momentum=params['momentum'],
+#                                alpha=0.0005, #best value from the graph
+#                                random_state=101))
+# partial_accuracy_scores = []
+# scores = cross_val_score(neural_network, X, Y,
+#                          scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
+#                          cv=KFold(n_splits=5, shuffle=False), n_jobs=-1)
+# for prediction in predictions_cross_val:
+#     partial_accuracy_scores.append(partial_accuracy(inverse_transform(prediction['Truth']),
+#                                                     inverse_transform(prediction['Predictions'])))
+# print(partial_accuracy_scores)
+# print("Scores by sklearn function ", scores)
+
+# Confusion matrix for label 11
+neural_network.fit(x_train, y_train)
+print(multilabel_confusion_matrix(y_true=y_test, y_pred=neural_network.predict(x_test), labels=[10]))

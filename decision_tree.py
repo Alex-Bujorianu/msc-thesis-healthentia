@@ -2,7 +2,7 @@ from statistics import mean, stdev
 import matplotlib.pyplot as plt
 from numpy import arange
 from sklearn import tree
-from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
+from sklearn.metrics import hamming_loss, make_scorer, accuracy_score, multilabel_confusion_matrix
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from skmultilearn.problem_transform import BinaryRelevance
 from helper import partial_accuracy_callable, plot_label_accuracy_cv, count_mismatch_proportion
@@ -64,3 +64,5 @@ print("The proportion of length mismatches is ", -1 * mean(cross_val_score(tree_
 print("The length ratio is ", mean(cross_val_score(tree_classifier, X, Y,
                          scoring=make_scorer(count_length_ratio, greater_is_better=True),
                          cv=kfold, n_jobs=-1)))
+tree_classifier.fit(x_train, y_train)
+print("DT confusion matrix", multilabel_confusion_matrix(y_true=y_test, y_pred=tree_classifier.predict(x_test), labels=[10]))

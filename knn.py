@@ -1,6 +1,6 @@
 from skmultilearn.adapt import MLkNN, BRkNNaClassifier
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold, cross_val_score
-from sklearn.metrics import hamming_loss, make_scorer, accuracy_score
+from sklearn.metrics import hamming_loss, make_scorer, accuracy_score, multilabel_confusion_matrix
 from helper import partial_accuracy, partial_accuracy_callable, \
     count_mismatch_proportion, label_accuracy, get_data, inverse_transform, normalise_data, \
     plot_label_accuracy, plot_label_accuracy_cv, count_length_ratio
@@ -54,6 +54,8 @@ print("The length ratio is ", mean(cross_val_score(model, X, Y,
                          scoring=make_scorer(count_length_ratio, greater_is_better=True),
                          cv=kfold, n_jobs=-1)))
 plot_label_accuracy_cv(model_name="MLkNN", model=model, Y=Y, X=X)
+model.fit(x_train, y_train)
+print("MLKNN confusion matrix", multilabel_confusion_matrix(y_true=y_test, y_pred=model.predict(x_test), labels=[10]))
 
 # Comparison with binary relevance knn
 # Mlknn incorporates MAP

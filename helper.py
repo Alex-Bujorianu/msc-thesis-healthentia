@@ -200,9 +200,12 @@ def label_accuracy(y_true: list, y_predicted: list, label: int) -> float:
     else:
         return 0
 
-def inverse_transform(to_transform: list) -> list:
+def inverse_transform(to_transform: np.ndarray) -> list:
     "Inverse transform from MLB"
     return mlb.inverse_transform(to_transform)
+
+def transform(to_transform: list) -> np.ndarray:
+    return mlb.transform(to_transform)
 
 def plot_label_accuracy(model_name: str, truth: np.ndarray, predictions: np.ndarray):
     # Per label performance
