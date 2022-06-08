@@ -33,7 +33,7 @@ def normalise_data(X: np.ndarray) -> np.ndarray:
 def standardise_data(X: np.ndarray) -> np.ndarray:
     scaler = StandardScaler(copy=True)
     # Figure our how to exclude gender, diabetes and chd from the scaling
-    print(X[0][7], X[0][8], X[0][9])
+    #print(X[0][7], X[0][8], X[0][9])
     scaler.fit(X)
     return scaler.transform(X)
 
@@ -127,6 +127,11 @@ def get_data(data_file: str, format="numpy"):
     training_set['chd'] = [1 if x == 'yes' else 0 for x in training_set['chd']]
     training_set['gender'] = [1 if x == 'male' else 0 for x in training_set['gender']]
     X = training_set.drop(labels=['Labels'], axis=1)
+    # for i in range(len(training_set['Labels'])):
+    #     try:
+    #        [int(x) for x in training_set['Labels'][i].split(",")]
+    #     except ValueError:
+    #         print("Error at ", i)
     Y = [[int(y) for y in x.split(",")] for x in training_set['Labels']]
     if format=="numpy":
         Y = mlb.transform(Y)
