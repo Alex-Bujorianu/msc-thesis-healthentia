@@ -13,8 +13,8 @@ X, Y = get_data("training_set.csv")
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
 y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
 
-hamming_loss_train = []
-hamming_loss_test = []
+partial_accuracy_train = []
+partial_accuracy_test = []
 
 tree_classifier = BinaryRelevance(
     classifier = tree.DecisionTreeClassifier(criterion="Gini"),
@@ -30,16 +30,16 @@ def prune_tree():
         tree_classifier.fit(x_train, y_train)
         y_train_predictions = tree_classifier.predict(x_train)
         y_test_predictions = tree_classifier.predict(x_test)
-        hamming_loss_train.append(hamming_loss(y_train, y_train_predictions))
-        hamming_loss_test.append(hamming_loss(y_test, y_test_predictions))
+        partial_accuracy_train.append(partial_accuracy_callable(y_train, y_train_predictions))
+        partial_accuracy_test.append(partial_accuracy_callable(y_test, y_test_predictions))
 
-    plt.plot(alphas, hamming_loss_train, label="train")
-    plt.plot(alphas, hamming_loss_test, label="test")
+    plt.plot(alphas, partial_accuracy_train, label="train")
+    plt.plot(alphas, partial_accuracy_test, label="test")
     plt.legend()
     plt.xlabel("CCP Alpha parameter")
-    plt.ylabel("Hamming Loss")
+    plt.ylabel("Partial accuracy")
     plt.show()
-
+prune_tree()
 # Sweet spot seems to be ccp_alpha=0.03
 tree_classifier = BinaryRelevance(
         classifier = tree.DecisionTreeClassifier(criterion="gini", ccp_alpha=0.03),
