@@ -70,7 +70,7 @@ def predict_with_knowledge_model(X: pd.DataFrame) -> list:
     return predictions
 
 tree_classifier = BinaryRelevance(
-        classifier = tree.DecisionTreeClassifier(criterion="gini", ccp_alpha=0.03),
+        classifier = tree.DecisionTreeClassifier(criterion="gini", ccp_alpha=0.01),
         require_dense = [True, True])
 dt_partial_accuracy = cross_val_score(tree_classifier, X, Y,
                          scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
