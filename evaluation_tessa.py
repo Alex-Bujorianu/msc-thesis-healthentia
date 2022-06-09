@@ -20,10 +20,16 @@ neural_network = MLPClassifier(solver='sgd', activation='relu', learning_rate_in
                                momentum=params['momentum'],
                                alpha=0.0005, #best value from the graph
                                random_state=101)
+params_lbfgs = json.load(open("lbfgs_nn_best_params.json", "r"))
+nn_lbfgs = MLPClassifier(activation='relu', solver='lbfgs', random_state=101, alpha=0.006, hidden_layer_sizes=tuple(params_lbfgs['hidden_layer_sizes']))
 cv = KFold(n_splits=5, random_state=101, shuffle=True)
 nn_partial_accuracy = cross_val_score(neural_network, X, Y,
                          scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
                          cv=cv, n_jobs=-1)
+nn_lbfgs_partial_accuracy = cross_val_score(nn_lbfgs, X, Y,
+                         scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
+                         cv=cv, n_jobs=-1)
+print("lbfgs mean partial accuracy ", mean(nn_lbfgs_partial_accuracy), "Standard deviation ", stdev(nn_lbfgs_partial_accuracy))
 print("NN mean partial accuracy ", mean(nn_partial_accuracy), "Standard deviation ", stdev(nn_partial_accuracy))
 knn_file = open("knn_best_params.json", "r")
 params_knn=json.load(knn_file)
