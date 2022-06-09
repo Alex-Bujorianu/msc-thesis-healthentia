@@ -42,7 +42,7 @@ def prune_tree():
 prune_tree()
 # Sweet spot seems to be ccp_alpha=0.03
 tree_classifier = BinaryRelevance(
-        classifier = tree.DecisionTreeClassifier(criterion="gini", ccp_alpha=0.03),
+        classifier = tree.DecisionTreeClassifier(criterion="gini", ccp_alpha=0.01),
         require_dense = [True, True])
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
 scores = cross_val_score(tree_classifier, X, Y,
@@ -65,4 +65,12 @@ print("The length ratio is ", mean(cross_val_score(tree_classifier, X, Y,
                          scoring=make_scorer(count_length_ratio, greater_is_better=True),
                          cv=kfold, n_jobs=-1)))
 tree_classifier.fit(x_train, y_train)
+print(tree_classifier.classifiers_)
+print("The last tree has ", tree_classifier.classifiers_[10].get_n_leaves(), " nodes")
+print("The last tree has ", tree_classifier.classifiers_[10].get_depth(), " depth")
+# Tree for label 11
+tree.plot_tree(tree_classifier.classifiers_[10])
+# Tree for first label
+tree.plot_tree(tree_classifier.classifiers_[0])
+plt.show()
 print("DT confusion matrix", multilabel_confusion_matrix(y_true=y_test, y_pred=tree_classifier.predict(x_test), labels=[10]))
