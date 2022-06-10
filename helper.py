@@ -91,8 +91,12 @@ def partial_accuracy_callable(coder_1, coder_2):
     # Scipy matrices can fuck off
     if len(coder_1) != len(coder_2):
         raise Exception("Lengths have to be the same")
-    coder_1 = inverse_transform(coder_1)
-    coder_2 = inverse_transform(coder_2)
+    # Following code is needed to work with SVM
+    # SVM is special, and not in a good way
+    new_mlb = MultiLabelBinarizer()
+    new_mlb.fit([list(range(coder_1.shape[1]))])
+    coder_1 = new_mlb.inverse_transform(coder_1)
+    coder_2 = new_mlb.inverse_transform(coder_2)
     total_accuracy = 0
     for i in range(len(coder_1)):
         subtotal_accuracy = 0

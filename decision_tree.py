@@ -40,7 +40,7 @@ def prune_tree():
     plt.ylabel("Partial accuracy")
     plt.show()
 prune_tree()
-# Sweet spot seems to be ccp_alpha=0.03
+# Sweet spot seems to be ccp_alpha=0.01
 tree_classifier = BinaryRelevance(
         classifier = tree.DecisionTreeClassifier(criterion="gini", ccp_alpha=0.01),
         require_dense = [True, True])
