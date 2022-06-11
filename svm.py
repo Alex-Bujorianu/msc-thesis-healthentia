@@ -6,7 +6,7 @@ from sklearn.metrics import hamming_loss, make_scorer, accuracy_score, multilabe
 from sklearn.model_selection import train_test_split, KFold, cross_val_score, GridSearchCV
 from skmultilearn.problem_transform import BinaryRelevance
 from helper import partial_accuracy_callable, plot_label_accuracy_cv, count_mismatch_proportion
-from helper import get_data, partial_accuracy, label_accuracy, \
+from helper import get_data, normalise_data, partial_accuracy, label_accuracy, \
     inverse_transform, cross_validate, count_length_ratio
 import json
 import math
@@ -17,14 +17,13 @@ def prune_unused_labels(data: np.ndarray) -> np.ndarray:
     new_data = 0
     for i in range(0, data.shape[1]):
         column = set(data[:, i])
-        print(column)
         if 1 not in column:
-            print("If statement executing")
             new_data = np.delete(data, i, axis=1)
     return new_data
 
 X, Y = get_data("training_set.csv")
 Y = prune_unused_labels(Y)
+X = normalise_data(X)
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
 y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
 print(Y.shape)
@@ -49,7 +48,7 @@ def optimise_svm():
     output_file = open("svm_best_params.json", "w")
     json.dump(obj=classifier.best_params_, fp=output_file)
 
-
+optimise_svm()
 input_file = open("svm_best_params.json", "r")
 params=json.load(input_file)
 svm_classifier = svm_classifier = BinaryRelevance(
