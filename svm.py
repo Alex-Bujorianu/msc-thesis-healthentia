@@ -25,17 +25,14 @@ X, Y = get_data("training_set.csv")
 print("Y before pruning ", Y.shape)
 # Label 4 has a single true value, we need to remove it manually
 # Make sure to do this BEFORE calling prune_unused_labels because the shape changes
-Y = np.delete(Y, 3, axis=1)
-Y = prune_unused_labels(Y)
-print(Y.shape)
+Y_pruned = np.delete(Y, 3, axis=1)
+Y_pruned = prune_unused_labels(Y_pruned)
+print(Y_pruned.shape)
 X = normalise_data(X)
-x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
-y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
 svm_classifier = BinaryRelevance(
     classifier = SVC(),
     require_dense = [False, True])
 
-svm_classifier.fit(x_train, y_train)
 #print("Predictions" , svm_classifier.predict(x_test))
 
 def optimise_svm():
@@ -45,25 +42,24 @@ def optimise_svm():
     # Grid search does 5-fold cross-validation
     classifier = GridSearchCV(svm_classifier, parameters, cv=5, n_jobs=-1, scoring=make_scorer(partial_accuracy_callable, greater_is_better=True))
     # No need to split, classifier already does cross-validation
-    classifier.fit(X, Y)
+    classifier.fit(X, Y_pruned)
     # The negative score is by design, not an error. See: https://stackoverflow.com/questions/44081222/hamming-loss-not-support-in-cross-val-score
     print('best parameters :', classifier.best_params_, 'Best accuracy: ',
           -1 * classifier.best_score_)
     output_file = open("svm_best_params.json", "w")
     json.dump(obj=classifier.best_params_, fp=output_file)
 
-optimise_svm()
 input_file = open("svm_best_params.json", "r")
 params=json.load(input_file)
 svm_classifier = svm_classifier = BinaryRelevance(
     classifier = SVC(C=params['classifier__C'], kernel=params['classifier__kernel']),
     require_dense = [True, True])
 kfold = KFold(n_splits=5, random_state=101, shuffle=True)
-scores = cross_val_score(svm_classifier, X, Y,
+scores = cross_val_score(svm_classifier, X, Y_pruned,
                          scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
                          cv=kfold, n_jobs=-1)
-# Because svm fails on some of the splits, we have to replace nans with zeros
-# SVM seems to be uniquely bad for our problem
+
+# This function is no longer needed
 def replace_nans(data:list) -> list:
     new_list = []
     for i in range(len(data)):
@@ -73,6 +69,17 @@ def replace_nans(data:list) -> list:
             new_list.append(data[i])
     return new_list
 
-scores = replace_nans(scores)
 print("The mean partial accuracy of the SVM is ", mean(scores),
       "\n", "The stdev is ", stdev(scores))
+scores_strict = cross_val_score(svm_classifier, X, Y_pruned,
+                         scoring=make_scorer(accuracy_score, greater_is_better=True),
+                         cv=kfold, n_jobs=-1)
+print("The mean strict accuracy is ", mean(scores_strict), "Stdev ", stdev(scores_strict))
+print("The proportion of length mismatches is ", -1 * mean(cross_val_score(svm_classifier, X, Y_pruned,
+                         scoring=make_scorer(count_mismatch_proportion, greater_is_better=False),
+                         cv=kfold, n_jobs=-1)))
+print("The mean length ratio is ", mean(cross_val_score(svm_classifier, X, Y_pruned,
+                         scoring=make_scorer(count_length_ratio, greater_is_better=True),
+                         cv=kfold, n_jobs=-1)))
+# We need to use special workarounds because labels 2 and 4 are missing
+plot_label_accuracy_cv(svm_classifier, X=X, Y=Y_pruned, model_name="SVM", offset=[1, 2])
