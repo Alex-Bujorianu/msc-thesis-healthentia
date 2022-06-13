@@ -22,11 +22,15 @@ def prune_unused_labels(data: np.ndarray) -> np.ndarray:
     return new_data
 
 X, Y = get_data("training_set.csv")
+print("Y before pruning ", Y.shape)
+# Label 4 has a single true value, we need to remove it manually
+# Make sure to do this BEFORE calling prune_unused_labels because the shape changes
+Y = np.delete(Y, 3, axis=1)
 Y = prune_unused_labels(Y)
+print(Y.shape)
 X = normalise_data(X)
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
 y_train, y_test = train_test_split(Y, train_size=0.8, random_state=101)
-print(Y.shape)
 svm_classifier = BinaryRelevance(
     classifier = SVC(),
     require_dense = [False, True])
