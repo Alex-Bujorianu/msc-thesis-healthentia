@@ -4,7 +4,7 @@ from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler, StandardSca
 import pandas as pd
 from scipy import sparse
 import matplotlib.pyplot as plt
-from statistics import mean
+from statistics import mean, stdev
 
 mlb = MultiLabelBinarizer()
 labels = list(range(1, 12))
@@ -256,16 +256,19 @@ def plot_label_accuracy_cv(model, X: np.ndarray, Y: np.ndarray, model_name: str,
                                          y_predicted=inverse_transform(dictionary['Predictions']), label=i)
         list_of_results.append(results)
 
-    print(list_of_results)
+    #print(list_of_results)
     final_results = {}
+    final_results_stdev = {}
     # Labels are numbered 1–11 not 0–10
     # This is deliberately hard-coded
     for i in range(1, 12):
         final_results[str(i)] = mean([d[str(i-1)] for d in list_of_results])
-    print(final_results)
+        final_results_stdev[str(i)] = stdev([d[str(i - 1)] for d in list_of_results])
+    #print(final_results)
     values = list(final_results.values())
     names = list(final_results.keys())
-    plt.bar(names, values, color='red')
+    plt.bar(names, values, color='tab:blue', yerr=list(final_results_stdev.values()),
+            ecolor='tab:orange', capsize=3.0)
     plt.xlabel("Label number")
     plt.ylabel("Correctly predicted proportion")
     plt.title(model_name + " per-label performance")
