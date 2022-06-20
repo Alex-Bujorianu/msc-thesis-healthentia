@@ -7,19 +7,9 @@ from sklearn.model_selection import train_test_split, KFold, cross_val_score, Gr
 from skmultilearn.problem_transform import BinaryRelevance
 from helper import partial_accuracy_callable, plot_label_accuracy_cv, count_mismatch_proportion
 from helper import get_data, normalise_data, partial_accuracy, label_accuracy, \
-    inverse_transform, cross_validate, count_length_ratio
+    inverse_transform, cross_validate, count_length_ratio, prune_unused_labels
 import json
 import math
-
-# SVM is uniquely annoying in that it cannot deal with one-class data
-# Label 2 is unused and hence “one class” – we need to prune it
-def prune_unused_labels(data: np.ndarray) -> np.ndarray:
-    new_data = 0
-    for i in range(0, data.shape[1]):
-        column = set(data[:, i])
-        if 1 not in column:
-            new_data = np.delete(data, i, axis=1)
-    return new_data
 
 X, Y = get_data("training_set.csv")
 print("Y before pruning ", Y.shape)

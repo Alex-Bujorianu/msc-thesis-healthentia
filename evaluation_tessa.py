@@ -1,17 +1,21 @@
 from knowledge_algorithm import knowledge_model
-from helper import get_data, partial_accuracy_callable, standardise_data, partial_accuracy
+from helper import get_data, partial_accuracy_callable, standardise_data, \
+    partial_accuracy, prune_unused_labels, normalise_data
 from sklearn.model_selection import KFold, cross_val_score
 from sklearn.metrics import accuracy_score, make_scorer
 from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
 import json
 from statistics import mean, stdev
 from skmultilearn.adapt import MLkNN, BRkNNaClassifier
 from skmultilearn.problem_transform import BinaryRelevance
 from sklearn import tree
 import pandas as pd
+import numpy as np
 
 X, Y = get_data("training_set_Tessa.csv")
 X = standardise_data(X)
+
 input_file = open("sgd_nn_best_params.json", "r")
 params=json.load(input_file)
 neural_network = MLPClassifier(solver='sgd', activation='relu', learning_rate_init=params['learning_rate_init'],
@@ -79,3 +83,15 @@ print("DT mean partial accuracy", mean(dt_partial_accuracy), "Standard deviation
 X_pd, Y_list = get_data("training_set_Tessa.csv", format="pandas")
 predictions = predict_with_knowledge_model(X_pd)
 print("Partial accuracy knowledge model: ", partial_accuracy(predictions, Y_list))
+X, Y = get_data("training_set_Tessa.csv")
+X = normalise_data(X)
+Y_pruned = np.delete(Y, 3, axis=1)
+Y_pruned = prune_unused_labels(Y_pruned)
+svm_params = json.load(open("svm_best_params.json", "r"))
+svm_classifier = BinaryRelevance(
+    classifier = SVC(C=svm_params['classifier__C'], kernel=svm_params['classifier__kernel']),
+    require_dense = [False, True])
+scores_svm = cross_val_score(svm_classifier, X, Y_pruned,
+                         scoring=make_scorer(partial_accuracy_callable, greater_is_better=True),
+                         cv=cv, n_jobs=-1)
+print("Mean partial accuracy SVM ", mean(scores_svm), "Stdev ", stdev(scores_svm))

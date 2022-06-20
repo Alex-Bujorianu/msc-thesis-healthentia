@@ -6,3 +6,4 @@ numpy
 nltk
 sklearn-genetic-opt
 seaborn
+radon

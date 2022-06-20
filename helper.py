@@ -1,10 +1,9 @@
-import numpy as np
-import scipy.sparse
-from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler, StandardScaler
-import pandas as pd
-from scipy import sparse
-import matplotlib.pyplot as plt
 from statistics import mean, stdev
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler, StandardScaler
 
 mlb = MultiLabelBinarizer()
 labels = list(range(1, 12))
@@ -36,6 +35,16 @@ def standardise_data(X: np.ndarray) -> np.ndarray:
     #print(X[0][7], X[0][8], X[0][9])
     scaler.fit(X)
     return scaler.transform(X)
+
+# SVM is uniquely annoying in that it cannot deal with one-class data
+# Label 2 is unused and hence “one class” – we need to prune it
+def prune_unused_labels(data: np.ndarray) -> np.ndarray:
+    new_data = 0
+    for i in range(0, data.shape[1]):
+        column = set(data[:, i])
+        if 1 not in column:
+            new_data = np.delete(data, i, axis=1)
+    return new_data
 
 def strict_accuracy(coder_1, coder_2):
     if len(coder_1) != len(coder_2):
