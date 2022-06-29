@@ -8,7 +8,7 @@ from sklearn.metrics import hamming_loss, make_scorer, accuracy_score, multilabe
 from statistics import mean, stdev
 import numpy as np
 import matplotlib.pyplot as plt
-
+from timeit import default_timer as timer
 
 X, Y = get_data("training_set.csv")
 # Make sure to scale X – very important!
@@ -91,4 +91,7 @@ print("The length ratio is ", mean(cross_val_score(neural_network, X, Y,
 
 # Confusion matrix for label 11
 neural_network.fit(x_train, y_train)
+start = timer()
+neural_network.predict(X)
+print("Time taken (ms): ", (timer()-start)*1000)
 print(multilabel_confusion_matrix(y_true=y_test, y_pred=neural_network.predict(x_test), labels=[10]))

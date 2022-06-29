@@ -10,6 +10,7 @@ from helper import get_data, normalise_data, partial_accuracy, label_accuracy, \
     inverse_transform, cross_validate, count_length_ratio, prune_unused_labels
 import json
 import math
+from timeit import default_timer as timer
 
 X, Y = get_data("training_set.csv")
 print("Y before pruning ", Y.shape)
@@ -76,4 +77,7 @@ print("The mean length ratio is ", mean(cross_val_score(svm_classifier, X, Y_pru
 # We need to use special workarounds because labels 2 and 4 are missing
 plot_label_accuracy_cv(svm_classifier, X=X, Y=Y_pruned, model_name="SVM", offset=[1, 2])
 svm_classifier.fit(x_train, y_train)
+start = timer()
+svm_classifier.predict(X)
+print("Time taken (ms): ", (timer()-start)*1000)
 print("SVM confusion matrix", multilabel_confusion_matrix(y_true=y_test, y_pred=svm_classifier.predict(x_test), labels=[8]))

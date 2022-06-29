@@ -8,6 +8,7 @@ from skmultilearn.problem_transform import BinaryRelevance
 from helper import partial_accuracy_callable, plot_label_accuracy_cv, count_mismatch_proportion
 from helper import get_data, partial_accuracy, label_accuracy, \
     inverse_transform, cross_validate, count_length_ratio
+from timeit import default_timer as timer
 
 X, Y = get_data("training_set.csv")
 x_train, x_test = train_test_split(X, train_size=0.8, random_state=101)
@@ -65,6 +66,9 @@ print("The length ratio is ", mean(cross_val_score(tree_classifier, X, Y,
                          scoring=make_scorer(count_length_ratio, greater_is_better=True),
                          cv=kfold, n_jobs=-1)))
 tree_classifier.fit(x_train, y_train)
+start = timer()
+tree_classifier.predict(X)
+print("Time taken (ms): ", (timer()-start)*1000)
 print(tree_classifier.classifiers_)
 print("The last tree has ", tree_classifier.classifiers_[10].get_n_leaves(), " nodes")
 print("The last tree has ", tree_classifier.classifiers_[10].get_depth(), " depth")

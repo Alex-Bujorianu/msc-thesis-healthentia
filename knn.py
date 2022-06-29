@@ -8,6 +8,7 @@ import numpy as np
 from statistics import mean, stdev
 import matplotlib.pyplot as plt
 import json
+from timeit import default_timer as timer
 
 X, Y = get_data("training_set.csv")
 X = normalise_data(X)
@@ -28,7 +29,7 @@ def optimise_mlknn():
     output_file = open("knn_best_params.json", "w")
     json.dump(obj=classifier.best_params_, fp=output_file)
 
-optimise_mlknn()
+
 # Load optimal params.
 input_file = open("knn_best_params.json", "r")
 params=json.load(input_file)
@@ -55,6 +56,9 @@ print("The length ratio is ", mean(cross_val_score(model, X, Y,
                          cv=kfold, n_jobs=-1)))
 plot_label_accuracy_cv(model_name="MLkNN", model=model, Y=Y, X=X)
 model.fit(x_train, y_train)
+start = timer()
+model.predict(X)
+print("Time taken (ms): ", (timer()-start)*1000)
 print("MLKNN confusion matrix", multilabel_confusion_matrix(y_true=y_test, y_pred=model.predict(x_test), labels=[10]))
 
 # Comparison with binary relevance knn

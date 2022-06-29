@@ -6,6 +6,7 @@ import pandas as pd
 from statistics import mean, stdev
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import multilabel_confusion_matrix
+from timeit import default_timer as timer
 
 X, Y = get_data("training_set.csv", format="pandas")
 print(Y)
@@ -35,7 +36,9 @@ def predict_with_knowledge_model(X: pd.DataFrame) -> list:
         predictions.append(predictor.predict(patient))
     return predictions
 
+start = timer()
 predictions = predict_with_knowledge_model(X)
+print("Time taken (ms): ", (timer()-start)*1000)
 print("Partial accuracy: ", partial_accuracy(predictions, Y))
 print("Strict accuracy: ", strict_accuracy(predictions, Y))
 print("Mismatch proportions", count_mismatch_proportion(predictions, Y))
