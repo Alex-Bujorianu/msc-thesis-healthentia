@@ -35,15 +35,6 @@ task = AnnotationTask(distance = masi_distance)
 task.load_array(task_data)
 print("Krippendorff's alpha", task.alpha())
 
-# Neither krippendorff nor disagree seem to support multi-labelled data
-# The code fails when I pass a list of integers
-# labels = list(range(1, 12))
-# df = pd.DataFrame({"Alex": labels_alex, "Harm": labels_Harm})
-# print(df)
-# krippendorff = disagree_metrics.Krippendorff(df, labels)
-# alpha = krippendorff.alpha(data_type="nominal")
-# print("Krippendorff’s alpha is ", alpha)
-
 # Transformations – this MLB is a pain in the ass
 mlb = MultiLabelBinarizer()
 # Problem: Harm has used more recommendations than I have, therefore fit_transform doesn't work
